@@ -1,0 +1,4 @@
+﻿ID_EVENTO,DATA_HORA,ID_QUADRO,SEVERIDADE,TITULO,DESCRICAO,STATUS_EVENTO,RESPONSAVEL
+EVT-001,2026-06-20 08:10,QD-12E2-001,INFO,Inspeção registrada,Quadro sem anomalias,FECHADO,Everton
+EVT-002,2026-06-20 09:20,QD-12E2-002,ALERTA,Temperatura elevada,Programar inspeção preventiva,ABERTO,Equipe elétrica
+EVT-003,2026-06-20 10:05,QD-05W3-001,ALARME,Carga elevada,Verificar circuitos de climatização,ABERTO,Equipe elétrica

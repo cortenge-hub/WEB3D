@@ -1,0 +1,6 @@
+﻿ID_OBJETO3D,TIPO,NOME,FORMATO,ARQUIVO_URL,PARAMETROS_JSON,OBS
+OBJ-QD-PARAM-800,QUADRO,Quadro 800x2200x400,PARAMETRICO,,"{largura:0.8,altura:2.2,profundidade:0.4}",Criado no próprio Three.js
+OBJ-QD-PARAM-1000,QUADRO,Quadro 1000x2200x500,PARAMETRICO,,"{largura:1.0,altura:2.2,profundidade:0.5}",Criado no próprio Three.js
+OBJ-QD-GLTF-CUBO,QUADRO,Quadro GLTF de exemplo,GLTF,02_ASSETS/03_MODELOS_GLB_GLTF/quadro_exemplo.gltf,,Arquivo GLTF local
+OBJ-CAMERA-360,CAMERA360,Símbolo câmera 360,PARAMETRICO,,{raio:0.18},Símbolo de câmera
+OBJ-SALA-ELETRICA-SVG,AMBIENTE,Sala elétrica SVG,SVG,02_ASSETS/01_PLANTAS_SVG/planta_12_eletrica.svg,,Planta/ambiente simplificado
