@@ -1,4 +1,4 @@
-﻿ID_QUADRO,TAG,DESCRICAO,ID_LOCAL,ID_OBJETO3D,SISTEMA,TIPO,SITUACAO,STATUS,ID_FOTO360,OBS
-QD-12E2-001,QDEC-12E2,Quadro de Distribuição E2,LOC-12-E2,OBJ-QD-PARAM-800,Elétrica,Distribuição,Novo,OK,F360-12-E2,Quadro exemplo com objeto paramétrico
-QD-12E2-002,QDEE-12E2,Quadro de Emergência E2,LOC-12-E3,OBJ-QD-GLTF-CUBO,Elétrica,Emergência,Novo,ALERTA,F360-12-E2,Quadro exemplo carregando GLTF
-QD-05W3-001,QF-CLIM-05W3,Quadro de força climatização,LOC-05-W3,OBJ-QD-PARAM-1000,Climatização,Força,Existente,ALARME,F360-05-W3,Exemplo em alarme
+﻿ID_QUADRO,TAG,DESCRICAO,ID_LOCAL,ID_OBJETO3D,SISTEMA,TIPO,SITUACAO,STATUS,ID_FOTO360,X_3D,Y_3D,Z_3D,ROT_X,ROT_Y,ROT_Z,OBS
+QD-12E2-001,QDEC-12E2,Quadro de Distribuição E2,LOC-12-E2,OBJ-QD-PARAM-800,Elétrica,Distribuição,Novo,OK,F360-12-E2,-3.20,1.10,-1.00,0,0,0,Quadro com posição própria no cadastro
+QD-12E2-002,QDEE-12E2,Quadro de Emergência E2,LOC-12-E2,OBJ-QD-GLTF-CUBO,Elétrica,Emergência,Novo,ALERTA,F360-12-E2,-2.35,1.10,-1.00,0,0,0,Quadro GLTF com posição própria
+QD-05W3-001,QF-CLIM-05W3,Quadro de força climatização,LOC-05-W3,OBJ-QD-PARAM-1000,Climatização,Força,Existente,ALARME,F360-05-W3,3.00,1.10,1.20,0,90,0,Rotacionado 90 graus no eixo Y
