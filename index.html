@@ -3,57 +3,739 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WEB3D - Quadros XYZ Rotação</title>
+<title>WEB3D - Visualizador de Quadros Elétricos</title>
+
 <style>
-:root{--bg:#0f172a;--top:#020617;--panel:#111827;--card:#1f2937;--border:#334155;--text:#e5e7eb;--muted:#94a3b8;--blue:#38bdf8;--ok:#22c55e;--alerta:#f59e0b;--alarme:#ef4444}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;overflow:hidden}
-header{height:58px;background:var(--top);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px}header h1{font-size:18px;margin:0}header span{font-size:12px;color:var(--muted)}
-main{height:calc(100vh - 58px);display:grid;grid-template-columns:370px 1fr 420px}aside,.info{background:var(--panel);overflow:auto;padding:12px}aside{border-right:1px solid var(--border)}.info{border-left:1px solid var(--border)}
-#viewer{position:relative;background:#0f172a}.card{background:var(--card);border:1px solid #3b4658;border-radius:12px;padding:12px;margin-bottom:12px}.card h2{font-size:15px;margin:0 0 10px}.small{font-size:12px;color:var(--muted);line-height:1.4}
-button{width:100%;padding:9px;border-radius:8px;border:1px solid var(--border);background:#0f172a;color:var(--text);font-size:12px;margin-top:6px;cursor:pointer}button:hover{border-color:var(--blue)}
-.log{background:#020617;color:#cbd5e1;border-radius:8px;padding:8px;font-family:Consolas,monospace;font-size:11px;white-space:pre-wrap;max-height:160px;overflow:auto}
-.tree-row{display:grid;grid-template-columns:26px 26px 1fr auto;align-items:center;gap:6px;padding:7px 8px;border-radius:8px;cursor:pointer;color:#cbd5e1;margin:3px 0}.tree-row:hover{background:#0f172a;color:white}.tree-row.selected{background:#075985;color:white}.tree-row.hidden-related{opacity:.38}
-.icon-btn{width:24px;height:24px;border-radius:6px;border:1px solid #475569;background:#020617;color:#cbd5e1;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;padding:0;margin:0}.icon-btn.off{opacity:.45;text-decoration:line-through;background:#1e293b}
-.badge{display:inline-block;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:bold}.badge.ok{background:rgba(34,197,94,.18);color:#86efac}.badge.alerta{background:rgba(245,158,11,.18);color:#fcd34d}.badge.alarme{background:rgba(239,68,68,.18);color:#fca5a5}
-.plant-box{position:relative;height:260px;background:white;border-radius:8px;overflow:hidden;border:1px solid #64748b}.plant-box svg{width:100%;height:100%}.pin{position:absolute;width:17px;height:17px;border-radius:50%;border:2px solid white;box-shadow:0 0 8px rgba(0,0,0,.7);transform:translate(-50%,-50%);cursor:pointer}.pin.ok{background:var(--ok)}.pin.alerta{background:var(--alerta)}.pin.alarme{background:var(--alarme)}
-table{width:100%;border-collapse:collapse;font-size:12px}td,th{border-bottom:1px solid var(--border);padding:7px 4px;text-align:left;vertical-align:top}.status{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:bold}.status.OK{background:rgba(34,197,94,.18);color:#86efac}.status.ALERTA{background:rgba(245,158,11,.18);color:#fcd34d}.status.ALARME{background:rgba(239,68,68,.18);color:#fca5a5}
-.toolbar{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:8px;flex-wrap:wrap;z-index:2}.tool-pill{background:rgba(2,6,23,.85);border:1px solid var(--border);border-radius:999px;padding:7px 12px;color:#cbd5e1;font-size:12px}
+:root{
+  --bg:#0f172a;--top:#020617;--panel:#111827;--card:#1f2937;
+  --border:#334155;--text:#e5e7eb;--muted:#94a3b8;
+  --blue:#38bdf8;--ok:#22c55e;--alerta:#f59e0b;--alarme:#ef4444;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+header{height:58px;background:var(--top);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+header h1{font-size:18px;margin:0}
+header span{font-size:12px;color:var(--muted)}
+main{height:calc(100vh - 58px);display:grid;grid-template-columns:385px 1fr 420px}
+aside,.info{background:var(--panel);overflow:auto;padding:12px}
+aside{border-right:1px solid var(--border)}
+.info{border-left:1px solid var(--border)}
+#viewer{position:relative;background:#0f172a}
+.card{background:var(--card);border:1px solid #3b4658;border-radius:12px;padding:12px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 10px}
+.small{font-size:12px;color:var(--muted);line-height:1.4}
+button,input{width:100%;padding:9px;border-radius:8px;border:1px solid var(--border);background:#0f172a;color:var(--text);font-size:12px;margin-top:6px}
+button{cursor:pointer}
+button:hover{border-color:var(--blue)}
+.log{background:#020617;color:#cbd5e1;border-radius:8px;padding:8px;font-family:Consolas,monospace;font-size:11px;white-space:pre-wrap;max-height:130px;overflow:auto}
+
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tab-btn{flex:1;border:1px solid var(--border);background:#0f172a;color:var(--text);border-radius:8px;padding:9px;cursor:pointer;font-weight:bold;font-size:12px;margin-top:0}
+.tab-btn.active{border-color:var(--blue);background:#082f49}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.tree{font-size:13px;line-height:1.35;margin-top:10px}
+.tree details{margin:6px 0;border:1px solid #334155;border-radius:10px;background:#111827;overflow:hidden}
+.tree summary{cursor:pointer;padding:9px 10px;list-style:none;user-select:none;background:#0f172a;font-weight:bold;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tree summary:hover{background:#082f49}
+.tree summary::-webkit-details-marker{display:none}
+.tree summary .title::before{content:"▸ ";color:var(--blue)}
+.tree details[open]>summary .title::before{content:"▾ "}
+.tree-children{padding:7px}
+.tree-row{display:grid;grid-template-columns:26px 26px 1fr auto;align-items:center;gap:6px;padding:7px 8px;border-radius:8px;cursor:pointer;color:#cbd5e1;margin:3px 0}
+.tree-row:hover{background:#0f172a;color:white}
+.tree-row.selected{background:#075985;color:white}
+.tree-row.hidden-related{opacity:.38}
+.icon-btn{width:24px;height:24px;border-radius:6px;border:1px solid #475569;background:#020617;color:#cbd5e1;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;padding:0;margin:0}
+.icon-btn:hover{border-color:var(--blue);color:white}
+.icon-btn.off{opacity:.45;text-decoration:line-through;background:#1e293b}
+.badge{display:inline-block;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:bold}
+.badge.ok{background:rgba(34,197,94,.18);color:#86efac}
+.badge.alerta{background:rgba(245,158,11,.18);color:#fcd34d}
+.badge.alarme{background:rgba(239,68,68,.18);color:#fca5a5}
+.badge.neutro{background:rgba(148,163,184,.18);color:#cbd5e1}
+
+.plant-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.plant-title strong{font-size:13px}
+.plant-title span{font-size:11px;color:var(--muted)}
+.plant-box{position:relative;height:260px;background:white;border-radius:8px;overflow:hidden;border:1px solid #64748b}
+.plant-box svg{width:100%;height:100%}
+.pin{position:absolute;width:17px;height:17px;border-radius:50%;border:2px solid white;box-shadow:0 0 8px rgba(0,0,0,.7);transform:translate(-50%,-50%);cursor:pointer}
+.pin.ok{background:var(--ok)}
+.pin.alerta{background:var(--alerta)}
+.pin.alarme{background:var(--alarme)}
+
+.config-table{display:grid;gap:10px}
+.csv-config{border:1px solid var(--border);border-radius:12px;background:#0f172a;padding:10px}
+.csv-config h3{margin:0 0 8px;font-size:13px;color:#fff}
+.source-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+.source-options label{font-weight:normal;background:#111827;border:1px solid var(--border);border-radius:8px;padding:7px;text-align:center;cursor:pointer;font-size:11px;color:#cbd5e1}
+.source-options input{width:auto;margin-right:4px}
+.load-row{display:grid;grid-template-columns:1fr 85px;gap:6px}
+.load-row button{margin-top:0}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{border-bottom:1px solid var(--border);padding:7px 4px;text-align:left;vertical-align:top}
+.status{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:bold}
+.status.OK{background:rgba(34,197,94,.18);color:#86efac}
+.status.ALERTA{background:rgba(245,158,11,.18);color:#fcd34d}
+.status.ALARME{background:rgba(239,68,68,.18);color:#fca5a5}
+
+.toolbar{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:8px;flex-wrap:wrap;z-index:2}
+.tool-pill{background:rgba(2,6,23,.85);border:1px solid var(--border);border-radius:999px;padding:7px 12px;color:#cbd5e1;font-size:12px}
 </style>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
 </head>
+
 <body>
-<header><h1>WEB3D - Quadros com XYZ e Rotação no 01_QUADROS.csv</h1><span>X_3D, Y_3D, Z_3D, ROT_X, ROT_Y, ROT_Z</span></header>
+<header>
+  <h1>WEB3D - Visualizador 3D de Quadros Elétricos</h1>
+  <span>Árvore corrigida + XYZ/rotação no 01_QUADROS.csv</span>
+</header>
+
 <main>
-<aside><div class="card"><h2>Fonte dos dados</h2><div class="small">O arquivo <b>01_QUADROS.csv</b> agora define a posição fina do objeto 3D do quadro.</div><button id="btnReload">Recarregar CSVs</button><div class="log" id="log">Aguardando leitura...</div></div><div class="card"><h2>Árvore - Quadros</h2><div id="treeQuadros"></div></div><div class="card"><h2>Planta baixa SVG</h2><div class="plant-box" id="plantBox"></div></div></aside>
-<div id="viewer"><div class="toolbar"><div class="tool-pill">Coordenadas vêm de 01_QUADROS.csv</div><div class="tool-pill" id="viewerSelection">Selecionado: -</div></div></div>
-<section class="info"><div class="card"><h2>Quadro selecionado</h2><div id="details">Nenhum quadro selecionado.</div></div><div class="card"><h2>Posição 3D do quadro</h2><table id="positionTable"></table></div><div class="card"><h2>Regra atualizada</h2><table><tr><th>Campo</th><th>Uso</th></tr><tr><td>ID_LOCAL</td><td>Relaciona o quadro com sala/local/pavimento</td></tr><tr><td>X_3D, Y_3D, Z_3D</td><td>Define a posição exata do objeto 3D quadro</td></tr><tr><td>ROT_X, ROT_Y, ROT_Z</td><td>Define a rotação do objeto em graus</td></tr></table></div></section>
+<aside>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="nav">Navegação</button>
+    <button class="tab-btn" data-tab="config">Configurações</button>
+  </div>
+
+  <div id="tab-nav" class="tab-content active">
+    <div class="card">
+      <h2>Fonte dos dados</h2>
+      <div class="small">Leitura dos CSVs publicados no GitHub Pages. A árvore é gerada automaticamente a partir dos arquivos CSV.</div>
+      <button id="btnReload">Recarregar CSVs</button>
+      <div class="log" id="log">Aguardando leitura...</div>
+    </div>
+
+    <div class="card">
+      <h2>Árvore do Projeto</h2>
+      <div class="small">A árvore fica limitada ao primeiro nível: Pavimentos, Locais, Quadros, Circuitos e Plantas. 👁 oculta/exibe; 🎯 enquadra.</div>
+      <div id="tree" class="tree"></div>
+    </div>
+
+    <div class="card">
+      <div class="plant-title">
+        <strong>Planta baixa SVG</strong>
+        <span id="plantActiveLabel">Pavimento inicial</span>
+      </div>
+      <div class="plant-box" id="plantBox"></div>
+    </div>
+  </div>
+
+  <div id="tab-config" class="tab-content">
+    <div class="card">
+      <h2>Configurações de Origem dos CSVs</h2>
+      <div class="small">Cada CSV pode futuramente usar GitHub, CSV público do Google Sheets ou link personalizado.</div>
+    </div>
+    <div class="card">
+      <h2>Arquivos CSV</h2>
+      <div class="config-table" id="csvConfigList"></div>
+    </div>
+  </div>
+</aside>
+
+<div id="viewer">
+  <div class="toolbar">
+    <div class="tool-pill">Coordenadas dos quadros: 01_QUADROS.csv</div>
+    <div class="tool-pill" id="viewerSelection">Selecionado: -</div>
+  </div>
+</div>
+
+<section class="info">
+  <div class="card">
+    <h2>Item selecionado</h2>
+    <div id="details">Nenhum item selecionado.</div>
+  </div>
+
+  <div class="card">
+    <h2>Posição / rotação</h2>
+    <table id="positionTable"></table>
+  </div>
+
+  <div class="card">
+    <h2>Relacionamentos</h2>
+    <table id="relationTable"></table>
+  </div>
+</section>
 </main>
+
 <script type="module">
 import * as THREE from "three";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-const CSV_URLS={quadros:"./01_CSV_DATABASE/01_QUADROS.csv",circuitos:"./01_CSV_DATABASE/02_CIRCUITOS.csv",pavimentos:"./01_CSV_DATABASE/03_PAVIMENTOS.csv",plantas:"./01_CSV_DATABASE/04_PLANTAS.csv",fotos360:"./01_CSV_DATABASE/05_FOTOS360.csv",documentos:"./01_CSV_DATABASE/06_DOCUMENTOS.csv",locais:"./01_CSV_DATABASE/07_LOCAIS.csv",objetos3d:"./01_CSV_DATABASE/08_OBJETOS3D.csv",eventos:"./01_CSV_DATABASE/09_EVENTOS.csv"};
-let DB={},selectedQuadro=null,panelMeshes=[];
-const logEl=document.getElementById("log"),treeQuadros=document.getElementById("treeQuadros"),details=document.getElementById("details"),positionTable=document.getElementById("positionTable"),viewerSelection=document.getElementById("viewerSelection"),plantBox=document.getElementById("plantBox");
-function log(m){logEl.textContent+="\n"+m;logEl.scrollTop=logEl.scrollHeight;console.log(m)}
-function parseCSV(text){const rows=[];let row=[],v="",q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c=='"'&&q&&n=='"'){v+='"';i++;continue}if(c=='"'){q=!q;continue}if(c==","&&!q){row.push(v);v="";continue}if((c=="\n"||c=="\r")&&!q){if(c=="\r"&&n=="\n")i++;row.push(v);v="";if(row.some(x=>String(x).trim()!=""))rows.push(row);row=[];continue}v+=c}if(v||row.length){row.push(v);if(row.some(x=>String(x).trim()!=""))rows.push(row)}if(!rows.length)return[];const h=rows.shift().map(x=>x.replace(/^\uFEFF/,"").trim());return rows.map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]||"").trim()])))}
-async function loadCSV(name,url){const r=await fetch(url+"?v="+Date.now());if(!r.ok)throw new Error(`${name}: HTTP ${r.status}`);return parseCSV(await r.text())}
-async function loadAll(){try{logEl.textContent="Lendo CSVs...";DB={};for(const [n,u] of Object.entries(CSV_URLS)){DB[n]=await loadCSV(n,u);log(`${n}: ${DB[n].length} registros`)}selectedQuadro=DB.quadros?.[0]||null;buildTree();buildScene();updatePlant();updateDetails();log("Leitura finalizada.")}catch(e){log("ERRO: "+e.message);console.error(e)}}
-function byId(list,field,value){return(list||[]).find(x=>x[field]===value)}
-function normalizarStatus(s){s=String(s||"OK").toUpperCase();if(s==="WARN"||s==="ATENCAO"||s==="ATENÇÃO")return"ALERTA";if(s==="ALARM")return"ALARME";return["OK","ALERTA","ALARME"].includes(s)?s:"OK"}
-function statusColor(s){s=normalizarStatus(s);return s==="ALARME"?0xef4444:s==="ALERTA"?0xf59e0b:0x22c55e}
-function degToRad(v){return Number(v||0)*Math.PI/180}
-function getQuadroPosition(q,loc){return{x:Number(q.X_3D||loc?.X_3D||0),y:Number(q.Y_3D||1.1),z:Number(q.Z_3D||loc?.Z_3D||0),rx:degToRad(q.ROT_X),ry:degToRad(q.ROT_Y),rz:degToRad(q.ROT_Z)}}
-function parseJSONSafe(t,f){try{return t?JSON.parse(t):f}catch{return f}}
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x0f172a);const viewer=document.getElementById("viewer"),camera=new THREE.PerspectiveCamera(60,viewer.clientWidth/viewer.clientHeight,0.1,1000);camera.position.set(8,6,9);camera.lookAt(0,0,0);const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(viewer.clientWidth,viewer.clientHeight);viewer.appendChild(renderer.domElement);scene.add(new THREE.AmbientLight(0xffffff,.65));const directional=new THREE.DirectionalLight(0xffffff,1.1);directional.position.set(5,10,6);scene.add(directional);const group=new THREE.Group();scene.add(group);const gltfLoader=new GLTFLoader(),raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
-function buildScene(){group.clear();panelMeshes=[];(DB.pavimentos||[]).forEach(pav=>{const y=Number(pav.COTA_Z||0)/10;const slab=new THREE.Mesh(new THREE.BoxGeometry(10,.08,7),new THREE.MeshStandardMaterial({color:0x164e63}));slab.position.y=y;group.add(slab);const edges=new THREE.LineSegments(new THREE.EdgesGeometry(slab.geometry),new THREE.LineBasicMaterial({color:0x94a3b8}));edges.position.copy(slab.position);group.add(edges)});(DB.quadros||[]).forEach(q=>{const loc=byId(DB.locais,"ID_LOCAL",q.ID_LOCAL),obj=byId(DB.objetos3d,"ID_OBJETO3D",q.ID_OBJETO3D),pos=getQuadroPosition(q,loc),params=parseJSONSafe(obj?.PARAMETROS_JSON,{largura:.8,altura:2.2,profundidade:.4});if(obj&&(obj.FORMATO==="GLTF"||obj.FORMATO==="GLB")&&obj.ARQUIVO_URL){gltfLoader.load(obj.ARQUIVO_URL,gltf=>{const root=gltf.scene;root.position.set(pos.x,pos.y,pos.z);root.rotation.set(pos.rx,pos.ry,pos.rz);root.traverse(child=>{if(child.isMesh){child.userData.quadro=q;panelMeshes.push(child)}});group.add(root);log("GLTF carregado: "+q.TAG)},undefined,()=>{createParamQuadro(q,pos,params)})}else createParamQuadro(q,pos,params)})}
-function createParamQuadro(q,pos,params){const l=Number(params.largura||.8),a=Number(params.altura||2.2),p=Number(params.profundidade||.4);const mesh=new THREE.Mesh(new THREE.BoxGeometry(l,a,p),new THREE.MeshStandardMaterial({color:statusColor(q.STATUS),metalness:.2,roughness:.55}));mesh.position.set(pos.x,pos.y,pos.z);mesh.rotation.set(pos.rx,pos.ry,pos.rz);mesh.userData.quadro=q;group.add(mesh);panelMeshes.push(mesh);const edges=new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry),new THREE.LineBasicMaterial({color:0xffffff}));edges.position.copy(mesh.position);edges.rotation.copy(mesh.rotation);group.add(edges)}
-function buildTree(){treeQuadros.innerHTML="";(DB.quadros||[]).forEach(q=>{const st=normalizarStatus(q.STATUS),row=document.createElement("div");row.className="tree-row"+(q.ID_QUADRO===selectedQuadro?.ID_QUADRO?" selected":"");row.innerHTML=`<button class="icon-btn eye">👁</button><button class="icon-btn frame">🎯</button><span>🧰 ${q.TAG}</span><span class="badge ${st.toLowerCase()}">${st}</span>`;row.onclick=e=>{if(e.target.classList.contains("icon-btn"))return;selectedQuadro=q;buildTree();updateDetails()};row.querySelector(".eye").onclick=e=>{e.stopPropagation();row.classList.toggle("hidden-related");e.currentTarget.classList.toggle("off")};row.querySelector(".frame").onclick=e=>{e.stopPropagation();selectedQuadro=q;buildTree();updateDetails();focusSelected()};treeQuadros.appendChild(row)})}
-function updatePlant(){plantBox.innerHTML="";const planta=DB.plantas?.[0];if(planta&&planta.ARQUIVO_URL){fetch(planta.ARQUIVO_URL+"?v="+Date.now()).then(r=>r.text()).then(svg=>{plantBox.innerHTML=svg;renderPins()}).catch(()=>renderPins())}else renderPins()}
-function renderPins(){(DB.quadros||[]).forEach(q=>{const loc=byId(DB.locais,"ID_LOCAL",q.ID_LOCAL);if(!loc)return;const pin=document.createElement("div");pin.className="pin "+normalizarStatus(q.STATUS).toLowerCase();pin.style.left=`${Number(loc.X_PLANTA||50)}%`;pin.style.top=`${Number(loc.Y_PLANTA||50)}%`;pin.title=q.TAG;pin.onclick=()=>{selectedQuadro=q;buildTree();updateDetails();focusSelected()};plantBox.appendChild(pin)})}
-function updateDetails(){const q=selectedQuadro;if(!q){details.innerHTML="Nenhum quadro selecionado.";positionTable.innerHTML="";return}const loc=byId(DB.locais,"ID_LOCAL",q.ID_LOCAL),pos=getQuadroPosition(q,loc),st=normalizarStatus(q.STATUS);details.innerHTML=`<p><strong>${q.TAG}</strong></p><p>${q.DESCRICAO||""}</p><p><span class="status ${st}">${st}</span></p><table><tr><td>ID_QUADRO</td><td>${q.ID_QUADRO||""}</td></tr><tr><td>ID_LOCAL</td><td>${q.ID_LOCAL||""}</td></tr><tr><td>ID_OBJETO3D</td><td>${q.ID_OBJETO3D||""}</td></tr><tr><td>Sistema</td><td>${q.SISTEMA||""}</td></tr><tr><td>Tipo</td><td>${q.TIPO||""}</td></tr></table>`;positionTable.innerHTML=`<tr><th>Campo</th><th>Valor</th></tr><tr><td>X_3D</td><td>${q.X_3D||"(vindo do local)"}</td></tr><tr><td>Y_3D</td><td>${q.Y_3D||"1.1 padrão"}</td></tr><tr><td>Z_3D</td><td>${q.Z_3D||"(vindo do local)"}</td></tr><tr><td>ROT_X</td><td>${q.ROT_X||0}°</td></tr><tr><td>ROT_Y</td><td>${q.ROT_Y||0}°</td></tr><tr><td>ROT_Z</td><td>${q.ROT_Z||0}°</td></tr><tr><td>Posição final</td><td>X=${pos.x}, Y=${pos.y}, Z=${pos.z}</td></tr>`;viewerSelection.textContent="Selecionado: "+q.TAG}
-function focusSelected(){if(!selectedQuadro)return;const mesh=panelMeshes.find(m=>m.userData.quadro?.ID_QUADRO===selectedQuadro.ID_QUADRO);if(!mesh)return;const pos=new THREE.Vector3();mesh.getWorldPosition(pos);camera.position.set(pos.x+4,pos.y+3,pos.z+5);camera.lookAt(pos)}
-renderer.domElement.addEventListener("click",event=>{const rect=renderer.domElement.getBoundingClientRect();mouse.x=((event.clientX-rect.left)/rect.width)*2-1;mouse.y=-((event.clientY-rect.top)/rect.height)*2+1;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(panelMeshes,true);if(hits.length){selectedQuadro=hits[0].object.userData.quadro;buildTree();updateDetails()}});
-function resize(){camera.aspect=viewer.clientWidth/viewer.clientHeight;camera.updateProjectionMatrix();renderer.setSize(viewer.clientWidth,viewer.clientHeight)}window.addEventListener("resize",resize);document.getElementById("btnReload").onclick=loadAll;function animate(){requestAnimationFrame(animate);renderer.render(scene,camera)}resize();animate();loadAll();
+
+const CSV_URLS = {
+  quadros:"./01_CSV_DATABASE/01_QUADROS.csv",
+  circuitos:"./01_CSV_DATABASE/02_CIRCUITOS.csv",
+  pavimentos:"./01_CSV_DATABASE/03_PAVIMENTOS.csv",
+  plantas:"./01_CSV_DATABASE/04_PLANTAS.csv",
+  fotos360:"./01_CSV_DATABASE/05_FOTOS360.csv",
+  documentos:"./01_CSV_DATABASE/06_DOCUMENTOS.csv",
+  locais:"./01_CSV_DATABASE/07_LOCAIS.csv",
+  objetos3d:"./01_CSV_DATABASE/08_OBJETOS3D.csv",
+  eventos:"./01_CSV_DATABASE/09_EVENTOS.csv"
+};
+
+const csvFiles = [
+  "01_QUADROS.csv","02_CIRCUITOS.csv","03_PAVIMENTOS.csv","04_PLANTAS.csv",
+  "05_FOTOS360.csv","06_DOCUMENTOS.csv","07_LOCAIS.csv","08_OBJETOS3D.csv","09_EVENTOS.csv"
+];
+
+let DB = {};
+let selected = null;
+let selectedPav = null;
+let panelMeshes = [];
+let hidden = new Set();
+
+const logEl = document.getElementById("log");
+const treeEl = document.getElementById("tree");
+const details = document.getElementById("details");
+const positionTable = document.getElementById("positionTable");
+const relationTable = document.getElementById("relationTable");
+const viewerSelection = document.getElementById("viewerSelection");
+const plantBox = document.getElementById("plantBox");
+const plantActiveLabel = document.getElementById("plantActiveLabel");
+
+function log(msg){logEl.textContent += "\\n" + msg; logEl.scrollTop = logEl.scrollHeight; console.log(msg);}
+
+function parseCSV(text){
+  const rows=[]; let row=[], value="", quoted=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(c === '"' && quoted && n === '"'){ value += '"'; i++; continue; }
+    if(c === '"'){ quoted = !quoted; continue; }
+    if(c === "," && !quoted){ row.push(value); value=""; continue; }
+    if((c === "\\n" || c === "\\r") && !quoted){
+      if(c === "\\r" && n === "\\n") i++;
+      row.push(value); value="";
+      if(row.some(v => String(v).trim() !== "")) rows.push(row);
+      row=[];
+      continue;
+    }
+    value += c;
+  }
+  if(value || row.length){ row.push(value); if(row.some(v => String(v).trim() !== "")) rows.push(row); }
+  if(!rows.length) return [];
+  const headers = rows.shift().map(h => h.replace(/^\\uFEFF/,"").trim());
+  return rows.map(r => Object.fromEntries(headers.map((h,i)=>[h,(r[i]||"").trim()])));
+}
+
+async function loadCSV(name,url){
+  const r = await fetch(url + "?v=" + Date.now());
+  if(!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
+  return parseCSV(await r.text());
+}
+
+async function loadAll(){
+  try{
+    logEl.textContent = "Lendo CSVs...";
+    DB = {};
+    for(const [name,url] of Object.entries(CSV_URLS)){
+      DB[name] = await loadCSV(name,url);
+      log(`${name}: ${DB[name].length} registros`);
+    }
+
+    selectedPav = DB.pavimentos?.[0]?.ID_PAV || null;
+    selected = selectedPav ? {type:"Pavimento", id:selectedPav} : null;
+
+    buildTree();
+    buildScene();
+    await updatePlant();
+    updateDetails();
+    log("Leitura finalizada.");
+  }catch(e){
+    log("ERRO: " + e.message);
+    console.error(e);
+  }
+}
+
+function byId(list,field,value){return (list||[]).find(x => x[field] === value);}
+function filterBy(list,field,value){return (list||[]).filter(x => x[field] === value);}
+
+function normalizarStatus(s){
+  s = String(s || "OK").toUpperCase();
+  if(s === "WARN" || s === "ATENCAO" || s === "ATENÇÃO") return "ALERTA";
+  if(s === "ALARM") return "ALARME";
+  return ["OK","ALERTA","ALARME"].includes(s) ? s : "OK";
+}
+function statusColor(s){
+  s = normalizarStatus(s);
+  if(s === "ALARME") return 0xef4444;
+  if(s === "ALERTA") return 0xf59e0b;
+  return 0x22c55e;
+}
+function degToRad(v){return Number(v || 0) * Math.PI / 180;}
+function parseJSONSafe(t,f){try{return t ? JSON.parse(t) : f;}catch{return f;}}
+
+function getQuadroPosition(q, loc){
+  return {
+    x: Number(q.X_3D || loc?.X_3D || 0),
+    y: Number(q.Y_3D || 1.1),
+    z: Number(q.Z_3D || loc?.Z_3D || 0),
+    rx: degToRad(q.ROT_X),
+    ry: degToRad(q.ROT_Y),
+    rz: degToRad(q.ROT_Z)
+  };
+}
+
+function getPavOfQuadro(q){
+  const loc = byId(DB.locais,"ID_LOCAL",q.ID_LOCAL);
+  return loc?.ID_PAV || "";
+}
+
+function getQuadrosByPav(idPav){
+  return (DB.quadros||[]).filter(q => getPavOfQuadro(q) === idPav);
+}
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0f172a);
+
+const viewer = document.getElementById("viewer");
+const camera = new THREE.PerspectiveCamera(60, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
+camera.position.set(8,6,9);
+camera.lookAt(0,0,0);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+viewer.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff,0.65));
+
+const directional = new THREE.DirectionalLight(0xffffff,1.1);
+directional.position.set(5,10,6);
+scene.add(directional);
+
+const group = new THREE.Group();
+scene.add(group);
+
+const gltfLoader = new GLTFLoader();
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function buildScene(){
+  group.clear();
+  panelMeshes = [];
+
+  (DB.pavimentos||[]).forEach(pav => {
+    const y = Number(pav.COTA_Z || 0) / 10;
+    const slab = new THREE.Mesh(
+      new THREE.BoxGeometry(10,0.08,7),
+      new THREE.MeshStandardMaterial({color:pav.ID_PAV === selectedPav ? 0x164e63 : 0x1e293b})
+    );
+    slab.position.y = y;
+    slab.userData = {type:"Pavimento", id:pav.ID_PAV};
+    group.add(slab);
+
+    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(slab.geometry), new THREE.LineBasicMaterial({color:0x94a3b8}));
+    edges.position.copy(slab.position);
+    group.add(edges);
+  });
+
+  (DB.quadros||[]).forEach(q => {
+    if(isHidden("Quadro", q.ID_QUADRO)) return;
+    if(isHidden("Pavimento", getPavOfQuadro(q))) return;
+    if(isHidden("Local", q.ID_LOCAL)) return;
+
+    const loc = byId(DB.locais,"ID_LOCAL",q.ID_LOCAL);
+    const obj = byId(DB.objetos3d,"ID_OBJETO3D",q.ID_OBJETO3D);
+    const pos = getQuadroPosition(q,loc);
+    const params = parseJSONSafe(obj?.PARAMETROS_JSON,{largura:.8,altura:2.2,profundidade:.4});
+
+    if(obj && (obj.FORMATO === "GLTF" || obj.FORMATO === "GLB") && obj.ARQUIVO_URL){
+      gltfLoader.load(obj.ARQUIVO_URL, gltf => {
+        const root = gltf.scene;
+        root.position.set(pos.x,pos.y,pos.z);
+        root.rotation.set(pos.rx,pos.ry,pos.rz);
+        root.traverse(child => {
+          if(child.isMesh){
+            child.userData = {type:"Quadro", id:q.ID_QUADRO, quadro:q};
+            panelMeshes.push(child);
+          }
+        });
+        group.add(root);
+      }, undefined, () => createParamQuadro(q,pos,params));
+    }else{
+      createParamQuadro(q,pos,params);
+    }
+  });
+}
+
+function createParamQuadro(q,pos,params){
+  const largura = Number(params.largura || .8);
+  const altura = Number(params.altura || 2.2);
+  const profundidade = Number(params.profundidade || .4);
+
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(largura,altura,profundidade),
+    new THREE.MeshStandardMaterial({color:statusColor(q.STATUS),metalness:.2,roughness:.55})
+  );
+  mesh.position.set(pos.x,pos.y,pos.z);
+  mesh.rotation.set(pos.rx,pos.ry,pos.rz);
+  mesh.userData = {type:"Quadro", id:q.ID_QUADRO, quadro:q};
+  group.add(mesh);
+  panelMeshes.push(mesh);
+
+  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), new THREE.LineBasicMaterial({color:0xffffff}));
+  edges.position.copy(mesh.position);
+  edges.rotation.copy(mesh.rotation);
+  group.add(edges);
+}
+
+function isHidden(type,id){return hidden.has(type + ":" + id);}
+
+function toggleHidden(type,id){
+  const key = type + ":" + id;
+  if(hidden.has(key)) hidden.delete(key);
+  else hidden.add(key);
+  buildTree();
+  buildScene();
+  updatePlant();
+}
+
+function buildTree(){
+  treeEl.innerHTML = "";
+
+  addGroup("Pavimentos", DB.pavimentos || [], item => ({
+    type:"Pavimento",
+    id:item.ID_PAV,
+    label:item.NOME || item.ID_PAV,
+    icon:"🏢",
+    badge:`${getQuadrosByPav(item.ID_PAV).length} quadros`,
+    badgeClass:"neutro"
+  }), true);
+
+  addGroup("Locais", DB.locais || [], item => ({
+    type:"Local",
+    id:item.ID_LOCAL,
+    label:item.NOME_LOCAL || item.ID_LOCAL,
+    icon:"📍",
+    badge:item.ID_PAV || "",
+    badgeClass:"neutro"
+  }));
+
+  addGroup("Quadros", DB.quadros || [], item => {
+    const s = normalizarStatus(item.STATUS);
+    return {
+      type:"Quadro",
+      id:item.ID_QUADRO,
+      label:item.TAG || item.ID_QUADRO,
+      icon:"🧰",
+      badge:s,
+      badgeClass:s.toLowerCase()
+    };
+  });
+
+  addGroup("Circuitos", DB.circuitos || [], item => {
+    const s = normalizarStatus(item.STATUS);
+    return {
+      type:"Circuito",
+      id:item.ID_CIRCUITO,
+      label:item.TAG_CIRCUITO || item.ID_CIRCUITO,
+      icon:"🔌",
+      badge:item.ID_QUADRO || "",
+      badgeClass:s.toLowerCase()
+    };
+  });
+
+  addGroup("Plantas", DB.plantas || [], item => ({
+    type:"Planta",
+    id:item.ID_PLANTA,
+    label:item.ID_PLANTA || item.ARQUIVO_URL,
+    icon:"🗺️",
+    badge:item.FORMATO || "SVG",
+    badgeClass:"neutro"
+  }));
+}
+
+function addGroup(title, list, mapper, open=false){
+  const details = document.createElement("details");
+  details.open = open;
+  details.innerHTML = `
+    <summary>
+      <span class="title">${title}</span>
+      <span class="badge neutro">${list.length}</span>
+    </summary>
+    <div class="tree-children"></div>
+  `;
+  const children = details.querySelector(".tree-children");
+
+  list.forEach(item => {
+    const n = mapper(item);
+    const row = document.createElement("div");
+    const selectedClass = selected?.type === n.type && selected?.id === n.id ? " selected" : "";
+    const hiddenClass = isHidden(n.type,n.id) ? " hidden-related" : "";
+    row.className = "tree-row" + selectedClass + hiddenClass;
+    row.innerHTML = `
+      <button class="icon-btn eye ${isHidden(n.type,n.id) ? "off" : ""}" title="Ocultar/exibir">👁</button>
+      <button class="icon-btn frame" title="Enquadrar">🎯</button>
+      <span>${n.icon} ${n.label}</span>
+      <span class="badge ${n.badgeClass}">${n.badge}</span>
+    `;
+
+    row.addEventListener("click", e => {
+      if(e.target.classList.contains("icon-btn")) return;
+      selected = {type:n.type, id:n.id};
+      if(n.type === "Pavimento") selectedPav = n.id;
+      updateAfterSelection();
+    });
+
+    row.querySelector(".eye").addEventListener("click", e => {
+      e.stopPropagation();
+      toggleHidden(n.type,n.id);
+    });
+
+    row.querySelector(".frame").addEventListener("click", e => {
+      e.stopPropagation();
+      selected = {type:n.type, id:n.id};
+      if(n.type === "Pavimento") selectedPav = n.id;
+      updateAfterSelection();
+      focusSelected();
+    });
+
+    children.appendChild(row);
+  });
+
+  treeEl.appendChild(details);
+}
+
+function updateAfterSelection(){
+  buildTree();
+  buildScene();
+  updatePlant();
+  updateDetails();
+}
+
+async function updatePlant(){
+  plantBox.innerHTML = "";
+
+  const planta =
+    (DB.plantas||[]).find(p => p.ID_PAV === selectedPav && p.FORMATO === "SVG")
+    || DB.plantas?.[0];
+
+  plantActiveLabel.textContent = selectedPav ? `${selectedPav} ativo` : "Pavimento ativo";
+
+  if(planta?.ARQUIVO_URL && !isHidden("Planta", planta.ID_PLANTA)){
+    try{
+      const svg = await (await fetch(planta.ARQUIVO_URL + "?v=" + Date.now())).text();
+      plantBox.innerHTML = svg;
+    }catch(e){
+      plantBox.innerHTML = "<div style='color:#111;padding:20px'>Falha ao carregar planta SVG.</div>";
+    }
+  }
+
+  renderPins();
+}
+
+function renderPins(){
+  (DB.quadros||[]).forEach(q => {
+    const loc = byId(DB.locais,"ID_LOCAL",q.ID_LOCAL);
+    if(!loc) return;
+    if(selectedPav && loc.ID_PAV !== selectedPav) return;
+    if(isHidden("Pavimento", loc.ID_PAV)) return;
+    if(isHidden("Local", q.ID_LOCAL)) return;
+    if(isHidden("Quadro", q.ID_QUADRO)) return;
+
+    const pin = document.createElement("div");
+    pin.className = "pin " + normalizarStatus(q.STATUS).toLowerCase();
+    pin.style.left = `${Number(loc.X_PLANTA || 50)}%`;
+    pin.style.top = `${Number(loc.Y_PLANTA || 50)}%`;
+    pin.title = q.TAG || q.ID_QUADRO;
+    pin.onclick = () => {
+      selected = {type:"Quadro", id:q.ID_QUADRO};
+      updateAfterSelection();
+      focusSelected();
+    };
+    plantBox.appendChild(pin);
+  });
+}
+
+function getSelectedData(){
+  if(!selected) return null;
+  if(selected.type === "Pavimento") return byId(DB.pavimentos,"ID_PAV",selected.id);
+  if(selected.type === "Local") return byId(DB.locais,"ID_LOCAL",selected.id);
+  if(selected.type === "Quadro") return byId(DB.quadros,"ID_QUADRO",selected.id);
+  if(selected.type === "Circuito") return byId(DB.circuitos,"ID_CIRCUITO",selected.id);
+  if(selected.type === "Planta") return byId(DB.plantas,"ID_PLANTA",selected.id);
+  return null;
+}
+
+function updateDetails(){
+  const item = getSelectedData();
+
+  if(!item || !selected){
+    details.innerHTML = "Nenhum item selecionado.";
+    positionTable.innerHTML = "";
+    relationTable.innerHTML = "";
+    return;
+  }
+
+  viewerSelection.textContent = `Selecionado: ${selected.type} ${selected.id}`;
+
+  details.innerHTML = `
+    <p><strong>${selected.type}</strong></p>
+    <table>
+      ${Object.entries(item).map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}
+    </table>
+  `;
+
+  if(selected.type === "Quadro"){
+    const loc = byId(DB.locais,"ID_LOCAL",item.ID_LOCAL);
+    const pos = getQuadroPosition(item,loc);
+
+    positionTable.innerHTML = `
+      <tr><th>Campo</th><th>Valor</th></tr>
+      <tr><td>X_3D</td><td>${item.X_3D || "(fallback do local)"}</td></tr>
+      <tr><td>Y_3D</td><td>${item.Y_3D || "1.1 padrão"}</td></tr>
+      <tr><td>Z_3D</td><td>${item.Z_3D || "(fallback do local)"}</td></tr>
+      <tr><td>ROT_X</td><td>${item.ROT_X || 0}°</td></tr>
+      <tr><td>ROT_Y</td><td>${item.ROT_Y || 0}°</td></tr>
+      <tr><td>ROT_Z</td><td>${item.ROT_Z || 0}°</td></tr>
+      <tr><td>Posição final</td><td>X=${pos.x}, Y=${pos.y}, Z=${pos.z}</td></tr>
+    `;
+  }else{
+    positionTable.innerHTML = "<tr><td>Posição 3D</td><td>Aplicável principalmente aos quadros e locais.</td></tr>";
+  }
+
+  relationTable.innerHTML = getRelations(selected,item);
+}
+
+function getRelations(sel,item){
+  if(sel.type === "Pavimento"){
+    const locais = filterBy(DB.locais,"ID_PAV",item.ID_PAV);
+    const quadros = getQuadrosByPav(item.ID_PAV);
+    const plantas = filterBy(DB.plantas,"ID_PAV",item.ID_PAV);
+    return `
+      <tr><td>Locais</td><td>${locais.length}</td></tr>
+      <tr><td>Quadros</td><td>${quadros.length}</td></tr>
+      <tr><td>Plantas</td><td>${plantas.length}</td></tr>
+    `;
+  }
+  if(sel.type === "Local"){
+    return `<tr><td>Quadros no local</td><td>${filterBy(DB.quadros,"ID_LOCAL",item.ID_LOCAL).length}</td></tr>`;
+  }
+  if(sel.type === "Quadro"){
+    return `
+      <tr><td>Circuitos</td><td>${filterBy(DB.circuitos,"ID_QUADRO",item.ID_QUADRO).length}</td></tr>
+      <tr><td>Documentos</td><td>${filterBy(DB.documentos,"ID_QUADRO",item.ID_QUADRO).length}</td></tr>
+      <tr><td>Eventos</td><td>${filterBy(DB.eventos,"ID_QUADRO",item.ID_QUADRO).length}</td></tr>
+    `;
+  }
+  if(sel.type === "Circuito"){
+    return `<tr><td>Quadro pai</td><td>${item.ID_QUADRO || ""}</td></tr>`;
+  }
+  if(sel.type === "Planta"){
+    return `<tr><td>Pavimento</td><td>${item.ID_PAV || ""}</td></tr><tr><td>Arquivo</td><td>${item.ARQUIVO_URL || ""}</td></tr>`;
+  }
+  return "";
+}
+
+function focusSelected(){
+  if(!selected) return;
+
+  if(selected.type === "Quadro"){
+    const mesh = panelMeshes.find(m => m.userData.id === selected.id);
+    if(mesh){
+      const pos = new THREE.Vector3();
+      mesh.getWorldPosition(pos);
+      camera.position.set(pos.x + 4, pos.y + 3, pos.z + 5);
+      camera.lookAt(pos);
+    }
+  }
+
+  if(selected.type === "Local"){
+    const qs = filterBy(DB.quadros,"ID_LOCAL",selected.id);
+    if(qs[0]){
+      selected = {type:"Quadro", id:qs[0].ID_QUADRO};
+      focusSelected();
+    }
+  }
+
+  if(selected.type === "Pavimento"){
+    const qs = getQuadrosByPav(selected.id);
+    if(qs[0]){
+      const loc = byId(DB.locais,"ID_LOCAL",qs[0].ID_LOCAL);
+      const pos = getQuadroPosition(qs[0],loc);
+      camera.position.set(pos.x + 6, pos.y + 5, pos.z + 7);
+      camera.lookAt(pos.x,pos.y,pos.z);
+    }
+  }
+
+  if(selected.type === "Circuito"){
+    const c = byId(DB.circuitos,"ID_CIRCUITO",selected.id);
+    const q = byId(DB.quadros,"ID_QUADRO",c?.ID_QUADRO);
+    if(q){
+      selected = {type:"Quadro", id:q.ID_QUADRO};
+      updateAfterSelection();
+      focusSelected();
+    }
+  }
+}
+
+renderer.domElement.addEventListener("click", event => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse,camera);
+  const hits = raycaster.intersectObjects(panelMeshes,true);
+  if(hits.length){
+    selected = {type:"Quadro", id:hits[0].object.userData.id};
+    updateAfterSelection();
+  }
+});
+
+function resize(){
+  camera.aspect = viewer.clientWidth / viewer.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+}
+
+function buildConfig(){
+  const el = document.getElementById("csvConfigList");
+  csvFiles.forEach(file => {
+    const id = file.replace(".csv","").toLowerCase();
+    const div = document.createElement("div");
+    div.className = "csv-config";
+    div.innerHTML = `
+      <h3>${file}</h3>
+      <div class="source-options">
+        <label><input type="radio" name="${id}_fonte" checked> GitHub</label>
+        <label><input type="radio" name="${id}_fonte"> Google Sheet</label>
+        <label><input type="radio" name="${id}_fonte"> Link</label>
+      </div>
+      <div class="load-row">
+        <input placeholder="Link personalizado ou CSV Google Sheets para ${file}">
+        <button>Carregar</button>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+  });
+});
+
+window.addEventListener("resize",resize);
+document.getElementById("btnReload").onclick = loadAll;
+
+function animate(){
+  requestAnimationFrame(animate);
+  renderer.render(scene,camera);
+}
+
+resize();
+buildConfig();
+animate();
+loadAll();
 </script>
 </body>
 </html>
