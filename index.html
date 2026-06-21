@@ -200,7 +200,7 @@ const viewerSelection = document.getElementById("viewerSelection");
 const plantBox = document.getElementById("plantBox");
 const plantActiveLabel = document.getElementById("plantActiveLabel");
 
-function log(msg){logEl.textContent += "\\n" + msg; logEl.scrollTop = logEl.scrollHeight; console.log(msg);}
+function log(msg){logEl.textContent += "\n" + msg; logEl.scrollTop = logEl.scrollHeight; console.log(msg);}
 
 function parseCSV(text){
   const rows=[]; let row=[], value="", quoted=false;
@@ -209,8 +209,8 @@ function parseCSV(text){
     if(c === '"' && quoted && n === '"'){ value += '"'; i++; continue; }
     if(c === '"'){ quoted = !quoted; continue; }
     if(c === "," && !quoted){ row.push(value); value=""; continue; }
-    if((c === "\\n" || c === "\\r") && !quoted){
-      if(c === "\\r" && n === "\\n") i++;
+    if((c === "\n" || c === "\r") && !quoted){
+      if(c === "\r" && n === "\n") i++;
       row.push(value); value="";
       if(row.some(v => String(v).trim() !== "")) rows.push(row);
       row=[];
