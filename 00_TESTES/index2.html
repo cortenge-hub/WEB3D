@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teste de Leitura - Quadros Elétricos TJRS</title>
+
+  <!-- Bibliotecas apenas para teste -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --ok: #166534;
+      --err: #991b1b;
+      --warn: #92400e;
+      --blue: #1d4ed8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      padding: 20px;
+      background: #111827;
+      color: white;
+    }
+
+    header h1 {
+      margin: 0 0 6px 0;
+      font-size: 22px;
+    }
+
+    header p {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    main {
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    .card h2 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+    }
+
+    .url {
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-all;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      cursor: pointer;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 9px 13px;
+      font-weight: 600;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    button.secondary {
+      background: #374151;
+    }
+
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .ok { color: var(--ok); }
+    .err { color: var(--err); }
+    .warn { color: var(--warn); }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: white;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+      min-width: 120px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f3f4f6;
+      z-index: 2;
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Teste de Leitura - Quadros Elétricos TJRS</h1>
+    <p>Arquivo de teste para validar carregamento de Google Sheets, CSV publicado e Excel no GitHub.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Teste Leitura 1 — Google Sheet direto</h2>
+      <div class="url" id="url1"></div>
+      <button onclick="testarGoogleSheetDireto()">Testar leitura direta</button>
+      <button class="secondary" onclick="limpar('resultado1')">Limpar</button>
+      <div class="note">
+        Observação: a URL de edição do Google Sheets normalmente não permite leitura direta via navegador.
+        O teste converte a URL para formato CSV exportado, mas a planilha precisa estar pública ou compartilhada corretamente.
+      </div>
+      <div id="resultado1" class="status">Aguardando teste...</div>
+    </section>
+
+    <section class="card">
+      <h2>Teste Leitura 2 — CSV publicado do Google Sheet</h2>
+      <div class="url" id="url2"></div>
+      <button onclick="testarCsvPublicado()">Testar CSV publicado</button>
+      <button class="secondary" onclick="limpar('resultado2')">Limpar</button>
+      <div id="resultado2" class="status">Aguardando teste...</div>
+    </section>
+
+    <section class="card">
+      <h2>Teste Leitura 3 — Excel no GitHub</h2>
+      <div class="url" id="url3"></div>
+      <button onclick="testarExcelGithub()">Testar Excel GitHub</button>
+      <button class="secondary" onclick="limpar('resultado3')">Limpar</button>
+      <div class="note">
+        O link do GitHub foi convertido automaticamente de <strong>/blob/main/</strong> para <strong>raw.githubusercontent.com</strong>.
+      </div>
+      <div id="resultado3" class="status">Aguardando teste...</div>
+    </section>
+  </main>
+
+  <script>
+    const URL_GOOGLE_SHEET_EDIT = 'https://docs.google.com/spreadsheets/d/1g3W6IAAK97VtM4Q8BLixNhMM6qvHpczNagXaWLnYPeY/edit?gid=548425096#gid=548425096';
+    const URL_CSV_PUBLICADO = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=548425096&single=true&output=csv';
+    const URL_EXCEL_GITHUB_BLOB = 'https://github.com/cortenge-hub/WEB3D/blob/main/Quadros%20El%C3%A9tricos%20TJRS.xlsx';
+    const URL_EXCEL_GITHUB_RAW = 'https://raw.githubusercontent.com/cortenge-hub/WEB3D/main/Quadros%20El%C3%A9tricos%20TJRS.xlsx';
+
+    document.getElementById('url1').textContent = URL_GOOGLE_SHEET_EDIT;
+    document.getElementById('url2').textContent = URL_CSV_PUBLICADO;
+    document.getElementById('url3').textContent = URL_EXCEL_GITHUB_RAW;
+
+    function setStatus(id, mensagem, classe = '') {
+      const el = document.getElementById(id);
+      el.className = 'status ' + classe;
+      el.innerHTML = mensagem;
+    }
+
+    function limpar(id) {
+      setStatus(id, 'Aguardando teste...');
+    }
+
+    function googleEditParaCsvExport(url) {
+      const matchId = url.match(/\/d\/([^/]+)/);
+      const matchGid = url.match(/[?&#]gid=([0-9]+)/);
+      if (!matchId) throw new Error('Não foi possível localizar o ID da planilha Google.');
+      const spreadsheetId = matchId[1];
+      const gid = matchGid ? matchGid[1] : '0';
+      return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`;
+    }
+
+    async function carregarCsv(url) {
+      const resposta = await fetch(url, { cache: 'no-store' });
+      if (!resposta.ok) {
+        throw new Error(`Erro HTTP ${resposta.status} ao carregar CSV.`);
+      }
+      const texto = await resposta.text();
+      if (!texto.trim()) {
+        throw new Error('CSV retornou vazio.');
+      }
+      return Papa.parse(texto, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: false
+      });
+    }
+
+    async function testarGoogleSheetDireto() {
+      const id = 'resultado1';
+      try {
+        const urlExport = googleEditParaCsvExport(URL_GOOGLE_SHEET_EDIT);
+        setStatus(id, `Carregando URL convertida:\n${urlExport}`);
+        const resultado = await carregarCsv(urlExport);
+        renderResultado(id, resultado.data, resultado.meta.fields, 'Google Sheet direto convertido para CSV');
+      } catch (erro) {
+        setStatus(id, `Falha no Teste 1:\n${erro.message}\n\nPossíveis causas:\n- Planilha não está pública;\n- Bloqueio de CORS/autenticação;\n- A URL de edição não é adequada para leitura direta.`, 'err');
+      }
+    }
+
+    async function testarCsvPublicado() {
+      const id = 'resultado2';
+      try {
+        setStatus(id, 'Carregando CSV publicado...');
+        const resultado = await carregarCsv(URL_CSV_PUBLICADO);
+        renderResultado(id, resultado.data, resultado.meta.fields, 'CSV publicado do Google Sheet');
+      } catch (erro) {
+        setStatus(id, `Falha no Teste 2:\n${erro.message}`, 'err');
+      }
+    }
+
+    async function testarExcelGithub() {
+      const id = 'resultado3';
+      try {
+        setStatus(id, 'Carregando Excel do GitHub raw...');
+        const resposta = await fetch(URL_EXCEL_GITHUB_RAW, { cache: 'no-store' });
+        if (!resposta.ok) {
+          throw new Error(`Erro HTTP ${resposta.status} ao carregar Excel.`);
+        }
+
+        const buffer = await resposta.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const primeiraAba = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[primeiraAba];
+        const linhas = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        const campos = linhas.length ? Object.keys(linhas[0]) : [];
+
+        renderResultado(id, linhas, campos, `Excel GitHub - aba lida: ${primeiraAba}`);
+      } catch (erro) {
+        setStatus(id, `Falha no Teste 3:\n${erro.message}\n\nConfira se o arquivo existe no GitHub e se o repositório está público.`, 'err');
+      }
+    }
+
+    function renderResultado(id, dados, campos, origem) {
+      const total = dados.length;
+      const preview = dados.slice(0, 20);
+
+      if (!total) {
+        setStatus(id, `<span class="warn">Leitura concluída, mas sem linhas de dados.</span>\nOrigem: ${origem}`, 'warn');
+        return;
+      }
+
+      const colunas = campos && campos.length ? campos : Object.keys(preview[0] || {});
+      let html = `<span class="ok">Leitura concluída com sucesso.</span>\n`;
+      html += `Origem: ${escapeHtml(origem)}\n`;
+      html += `Total de linhas: ${total}\n`;
+      html += `Colunas detectadas: ${colunas.map(escapeHtml).join(', ')}\n`;
+      html += `<div class="table-wrap"><table><thead><tr>`;
+      html += colunas.map(c => `<th>${escapeHtml(c)}</th>`).join('');
+      html += `</tr></thead><tbody>`;
+
+      for (const linha of preview) {
+        html += '<tr>';
+        html += colunas.map(c => `<td>${escapeHtml(linha[c] ?? '')}</td>`).join('');
+        html += '</tr>';
+      }
+
+      html += `</tbody></table></div>`;
+      html += `<div class="note">Pré-visualização limitada às primeiras 20 linhas.</div>`;
+      setStatus(id, html, '');
+    }
+
+    function escapeHtml(valor) {
+      return String(valor)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+  </script>
+</body>
+</html>
