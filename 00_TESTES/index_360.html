@@ -3,577 +3,113 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teste Fotos 360 - Quadros Elétricos</title>
-
+  <title>Teste Fotos 360 - Quadros Elétricos | V2</title>
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
-
   <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --card: #1f2937;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --accent: #38bdf8;
-      --accent2: #22c55e;
-      --danger: #ef4444;
-      --border: #334155;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    header {
-      padding: 18px 22px;
-      background: linear-gradient(90deg, #111827, #1e293b);
-      border-bottom: 1px solid var(--border);
-    }
-
-    header h1 {
-      margin: 0 0 6px;
-      font-size: 22px;
-    }
-
-    header p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 14px 18px;
-      background: #020617;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .tab-btn {
-      border: 1px solid var(--border);
-      background: var(--panel);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .tab-btn.active {
-      background: var(--accent);
-      color: #00111f;
-      border-color: var(--accent);
-    }
-
-    main { padding: 18px; }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.18);
-    }
-
-    .card h2, .card h3 {
-      margin-top: 0;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      color: var(--muted);
-      margin: 12px 0 6px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: #020617;
-      color: var(--text);
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 14px;
-    }
-
-    textarea { min-height: 78px; resize: vertical; }
-
-    button.action {
-      margin-top: 12px;
-      width: 100%;
-      border: 0;
-      border-radius: 8px;
-      padding: 11px 12px;
-      font-weight: 700;
-      background: var(--accent2);
-      color: #052e16;
-      cursor: pointer;
-    }
-
-    button.secondary {
-      background: #334155;
-      color: var(--text);
-    }
-
-    .viewer {
-      width: 100%;
-      height: calc(100vh - 210px);
-      min-height: 520px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: #000;
-    }
-
-    .list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .photo-item {
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--card);
-      cursor: pointer;
-    }
-
-    .photo-item:hover { border-color: var(--accent); }
-    .photo-item strong { display: block; margin-bottom: 4px; }
-    .photo-item small { color: var(--muted); word-break: break-all; }
-
-    .status {
-      margin-top: 10px;
-      font-size: 13px;
-      color: var(--muted);
-      white-space: pre-wrap;
-    }
-
-    .hotspot-label {
-      background: rgba(15, 23, 42, .92);
-      border: 2px solid #38bdf8;
-      color: white;
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: bold;
-      box-shadow: 0 8px 20px rgba(0,0,0,.35);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .hotspot-label.quadro { border-color: #22c55e; }
-    .hotspot-label.porta { border-color: #f59e0b; }
-    .hotspot-label.alerta { border-color: #ef4444; }
-
-    .note {
-      color: var(--muted);
-      line-height: 1.45;
-      font-size: 14px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    th, td {
-      border-bottom: 1px solid var(--border);
-      padding: 8px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th { color: var(--accent); }
-
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: 1fr; }
-      .viewer { height: 520px; }
-    }
+    :root{--bg:#0b1220;--panel:#111827;--card:#1f2937;--card2:#0f172a;--text:#e5e7eb;--muted:#94a3b8;--accent:#0284c7;--accent2:#22c55e;--warn:#f59e0b;--danger:#ef4444;--border:#334155;--white:#fff}
+    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    header{padding:18px 22px;background:linear-gradient(90deg,#0f172a,#1e293b);border-bottom:1px solid var(--border)}
+    h1{margin:0 0 6px;font-size:22px} h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:18px 0 8px;color:#dbeafe}.small{font-size:12px;color:var(--muted)}
+    .wrap{padding:18px 22px}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}.tab{border:1px solid var(--border);background:#162033;color:var(--text);padding:10px 12px;border-radius:10px;cursor:pointer}.tab.active{background:var(--accent);border-color:#38bdf8;color:#fff}
+    .panel{display:none;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.viewer{height:560px;min-height:420px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#000}.viewer.smallv{height:420px} button,.btn{border:none;background:var(--accent);color:#fff;border-radius:9px;padding:9px 12px;cursor:pointer;font-weight:600;text-decoration:none;display:inline-block}button.secondary{background:#334155}button.green{background:#16a34a}button.warn{background:#d97706}button.danger{background:#dc2626} input,select,textarea{width:100%;border:1px solid var(--border);background:#0b1220;color:var(--text);border-radius:8px;padding:9px}.field{margin:8px 0}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}table{width:100%;border-collapse:collapse;margin-top:10px;background:#0b1220;border-radius:10px;overflow:hidden}th,td{border-bottom:1px solid var(--border);padding:8px;text-align:left;font-size:12px;vertical-align:top}th{background:#172033;color:#cbd5e1}.status{padding:10px;border-radius:10px;background:#0f172a;border:1px solid var(--border);margin:10px 0;color:#cbd5e1}.status.ok{border-color:#16a34a}.status.err{border-color:#dc2626}.status.warn{border-color:#d97706}.pill{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:4px 8px;font-size:11px;color:#cbd5e1;margin:2px}.note{background:#111827;border-left:4px solid var(--warn);padding:10px;border-radius:8px;color:#cbd5e1}.hotspot-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;background:#0369a1;border:2px solid white;box-shadow:0 3px 12px rgba(0,0,0,.45);cursor:pointer;font-size:18px;transform:translate(-17px,-17px)}.hotspot-icon.panel-icon{background:#f59e0b}.hotspot-icon.next-icon{background:#16a34a}.hotspot-icon.info-icon{background:#0ea5e9}.hotspot-label{position:absolute;left:26px;top:-4px;white-space:nowrap;background:#075985;color:#fff;border:1px solid rgba(255,255,255,.65);border-radius:6px;padding:4px 7px;font-size:11px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.35)}.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999}.modal.show{display:flex}.modalbox{width:min(620px,92vw);background:#0f172a;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.modalbox pre{white-space:pre-wrap;background:#020617;border:1px solid var(--border);padding:10px;border-radius:8px;color:#cbd5e1}.code{font-family:Consolas,monospace;font-size:12px;background:#020617;border:1px solid var(--border);padding:8px;border-radius:8px;color:#a7f3d0;overflow:auto} iframe{width:100%;height:520px;border:1px solid var(--border);border-radius:12px;background:white}
   </style>
 </head>
 <body>
-  <header>
-    <h1>Teste Fotos 360 - Quadros Elétricos</h1>
-    <p>Protótipo HTML para testar links 360, Google Fotos, Google Sheets/CSV e marcadores estilo tour virtual.</p>
-  </header>
+<header><h1>Teste Fotos 360 - Quadros Elétricos | V2</h1><div class="small">Protótipo HTML com abas, Pannellum, Google Sheets/CSV, tabela de integração e marcadores interativos dentro da foto 360.</div></header>
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="t1">Teste 1 - Links GitHub</button>
+    <button class="tab" data-tab="t2">Teste 2 - Google Fotos</button>
+    <button class="tab" data-tab="csv">Google Sheets / CSV</button>
+    <button class="tab" data-tab="viewer">Visualizador 360 + Marcadores</button>
+    <button class="tab" data-tab="modelo">Tabela de Integração</button>
+  </div>
 
-  <nav class="tabs">
-    <button class="tab-btn active" onclick="openTab('teste1', this)">Teste 1 - Links ativos</button>
-    <button class="tab-btn" onclick="openTab('teste2', this)">Teste 2 - Google Fotos</button>
-    <button class="tab-btn" onclick="openTab('csv', this)">Google Sheets / CSV</button>
-    <button class="tab-btn" onclick="openTab('viewer360', this)">Visualizador 360 + Marcadores</button>
-  </nav>
+  <section id="t1" class="panel active">
+    <h2>Teste 1 - links ativos de fotos 360</h2>
+    <div class="grid">
+      <div class="card"><h3>Foto 360 - 367</h3><div id="viewerGit1" class="viewer smallv"></div><p><button onclick="loadSingleViewer('viewerGit1', photos.github1)">Recarregar</button></p></div>
+      <div class="card"><h3>Foto 360 - 362</h3><div id="viewerGit2" class="viewer smallv"></div><p><button onclick="loadSingleViewer('viewerGit2', photos.github2)">Recarregar</button></p></div>
+    </div>
+  </section>
 
-  <main>
-    <section id="teste1" class="tab-content active">
-      <div class="grid">
-        <aside class="card">
-          <h2>Links ativos de foto 360</h2>
-          <p class="note">Clique em uma foto para carregar no visualizador Pannellum.</p>
-          <div class="list" id="activePhotoList"></div>
-        </aside>
-        <div id="viewerTeste1" class="viewer"></div>
+  <section id="t2" class="panel">
+    <h2>Teste 2 - link do visualizador direto do Google Fotos</h2>
+    <div class="note"><b>Observação técnica:</b> links do Google Fotos geralmente não entregam o arquivo JPG direto para bibliotecas 360. Eles abrem uma página do Google, com autenticação, cookies e bloqueios de incorporação. Para Pannellum/visualizador 360 funcionar, o ideal é usar uma URL direta de imagem JPG/PNG publicada em GitHub Pages, servidor próprio, Google Drive com link direto, S3, Cloudflare R2 ou similar.</div>
+    <div class="field"><label>Link Google Fotos recebido</label><input id="googlePhotoUrl" value="https://photos.google.com/share/AF1QipNklhgqZIQF55--ilEI-Exzw8984sDGJRXlMrPLv3BTQaQJvSef8JRUA1htfqm4GQ/photo/AF1QipMy2aAy4lBEkkZ44Isdu1G5Vdv1Z8vQrLrzs0Ok?key=MkdELWpua3dOcjZXbl9NdXdFVFpCdlJhUHB6WkN3"></div>
+    <div class="row"><button onclick="testGooglePhotos()">Testar em iframe</button><a class="btn" target="_blank" href="https://photos.google.com/share/AF1QipNklhgqZIQF55--ilEI-Exzw8984sDGJRXlMrPLv3BTQaQJvSef8JRUA1htfqm4GQ/photo/AF1QipMy2aAy4lBEkkZ44Isdu1G5Vdv1Z8vQrLrzs0Ok?key=MkdELWpua3dOcjZXbl9NdXdFVFpCdlJhUHB6WkN3">Abrir fora do HTML</a></div>
+    <div id="gphotosStatus" class="status warn">Este teste valida abertura externa/iframe. Não substitui URL direta de imagem 360.</div>
+    <iframe id="gphotosFrame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+  </section>
+
+  <section id="csv" class="panel">
+    <h2>Google Sheets / CSV</h2>
+    <div class="field"><label>URL CSV publicado</label><input id="csvUrl" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=902563468&single=true&output=csv"></div>
+    <div class="row"><button onclick="loadCsv()">Carregar CSV online</button><button class="secondary" onclick="loadCsvViaProxy()">Tentar via proxy CORS</button><button class="green" onclick="downloadModeloCsv()">Baixar modelo CSV</button></div>
+    <div class="field"><label>Alternativa local: importar arquivo CSV baixado do Google Sheets</label><input type="file" id="csvFile" accept=".csv,text/csv" onchange="loadCsvFile(event)"></div>
+    <div id="csvStatus" class="status">Aguardando carregamento.</div>
+    <h3>Dados encontrados</h3><div id="csvTable"></div>
+  </section>
+
+  <section id="viewer" class="panel">
+    <h2>Visualizador 360 + Marcadores Interativos</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Controles</h3>
+        <div class="field"><label>Selecionar cena</label><select id="sceneSelect" onchange="changeScene(this.value)"></select></div>
+        <div class="row"><button onclick="addDemoMarkers()">Reinserir marcadores</button><button class="secondary" onclick="viewerObj && viewerObj.toggleFullscreen()">Tela cheia</button></div>
+        <p class="small">Clique nos ícones dentro da foto: informação, quadro elétrico ou próxima cena.</p>
+        <div id="markerInfo" class="status">Marcadores prontos para teste.</div>
       </div>
-    </section>
+      <div class="card"><h3>Legenda</h3><span class="pill">ℹ️ Informação</span><span class="pill">⚡ Quadro elétrico</span><span class="pill">➜ Navegação</span><p class="small">Os hotspots são gerados por yaw/pitch. Use o modo debug do Pannellum no console, se precisar levantar coordenadas exatas.</p></div>
+    </div>
+    <div id="mainViewer" class="viewer"></div>
+  </section>
 
-    <section id="teste2" class="tab-content">
-      <div class="grid">
-        <aside class="card">
-          <h2>Google Fotos</h2>
-          <p class="note">
-            Este link é do visualizador do Google Fotos. Normalmente ele abre como página compartilhada,
-            mas não entrega uma URL direta .jpg com CORS liberado para renderização 360 dentro do HTML.
-          </p>
-          <label>Link Google Fotos</label>
-          <textarea id="googlePhotosUrl">https://photos.google.com/share/AF1QipNklhgqZIQF55--ilEI-Exzw8984sDGJRXlMrPLv3BTQaQJvSef8JRUA1htfqm4GQ/photo/AF1QipMy2aAy4lBEkkZ44Isdu1G5Vdv1Z8vQrLrzs0Ok?key=MkdELWpua3dOcjZXbl9NdXdFVFpCdlJhUHB6WkN3</textarea>
-          <button class="action" onclick="openGooglePhotos()">Abrir link em nova aba</button>
-          <button class="action secondary" onclick="tryLoadGooglePhotos()">Tentar carregar como panorama</button>
-          <div class="status" id="googleStatus"></div>
-        </aside>
-        <div id="viewerGoogle" class="viewer"></div>
-      </div>
-    </section>
+  <section id="modelo" class="panel">
+    <h2>Tabela para integração com Google Sheets / Street Viewer / Tour 360</h2>
+    <p class="small">Use estas colunas no Google Sheets. Cada linha pode representar uma foto 360 ou um marcador dentro de uma foto 360.</p>
+    <div class="code">id,tipo,titulo,url_foto360,pavimento,setor,quadro,circuito,ambiente,descricao,yaw,pitch,icone,destino_scene,google_maps_url,status</div>
+    <table><thead><tr><th>Coluna</th><th>Uso</th><th>Exemplo</th></tr></thead><tbody id="schemaRows"></tbody></table>
+    <h3>Exemplo de registros</h3><div id="exampleRows"></div>
+  </section>
+</div>
 
-    <section id="csv" class="tab-content">
-      <div class="grid">
-        <aside class="card">
-          <h2>Google Sheets / CSV</h2>
-          <p class="note">Carrega o CSV publicado e tenta localizar colunas com URL de foto 360.</p>
-          <label>URL CSV publicado</label>
-          <textarea id="csvUrl">https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=902563468&single=true&output=csv</textarea>
-          <button class="action" onclick="loadCsv()">Carregar CSV</button>
-          <div class="status" id="csvStatus"></div>
-        </aside>
-        <section class="card">
-          <h2>Dados encontrados</h2>
-          <div id="csvTable">Nenhum CSV carregado ainda.</div>
-        </section>
-      </div>
-    </section>
+<div id="modal" class="modal" onclick="closeModal(event)"><div class="modalbox"><h2 id="modalTitle">Detalhe</h2><pre id="modalText"></pre><button onclick="hideModal()">Fechar</button></div></div>
 
-    <section id="viewer360" class="tab-content">
-      <div class="grid">
-        <aside class="card">
-          <h2>Visualizador 360 com marcadores</h2>
-          <p class="note">Protótipo inspirado em Matterport / tour virtual: marcadores dentro da imagem para quadros, portas, alertas e navegação.</p>
+<script>
+const photos={github1:'https://cortenge-hub.github.io/WEB3D/02_ASSETS/06_FOTOS360/IMG_20260618_120603_00_367.jpg',github2:'https://cortenge-hub.github.io/WEB3D/02_ASSETS/06_FOTOS360/IMG_20260618_120037_00_362.jpg'};
+const csvDefault=document.getElementById('csvUrl').value;
+let viewerObj=null; let csvRows=[];
+let scenes=[
+  {id:'foto367',title:'Foto 360 - IMG 367',url:photos.github1,markers:[{yaw:12,pitch:-4,icon:'info',title:'Acesso principal',text:'Ponto de inspeção / referência da foto 360.'},{yaw:65,pitch:-8,icon:'panel',title:'Quadro elétrico QD-01',text:'Exemplo de marcador técnico: quadro, circuito, pavimento e observações.'},{yaw:-38,pitch:-5,icon:'next',title:'Ir para Foto 362',text:'Navegação entre cenas.',target:'foto362'}]},
+  {id:'foto362',title:'Foto 360 - IMG 362',url:photos.github2,markers:[{yaw:-20,pitch:-3,icon:'info',title:'Ambiente técnico',text:'Segundo ponto 360 carregado pelo link GitHub.'},{yaw:45,pitch:-7,icon:'panel',title:'Quadro elétrico QD-02',text:'Exemplo de hotspot com informação técnica.'},{yaw:120,pitch:-4,icon:'next',title:'Voltar para Foto 367',text:'Navegação entre cenas.',target:'foto367'}]}
+];
 
-          <label>Foto 360</label>
-          <select id="photoSelect"></select>
-
-          <label>Yaw inicial</label>
-          <input id="yawInput" type="number" value="0" />
-
-          <label>Pitch inicial</label>
-          <input id="pitchInput" type="number" value="0" />
-
-          <button class="action" onclick="loadMainViewer()">Carregar visualização</button>
-          <button class="action secondary" onclick="addMarkerAtCurrentView()">Adicionar marcador na posição atual</button>
-
-          <div class="status" id="markerStatus"></div>
-        </aside>
-        <div id="viewerMain" class="viewer"></div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    const activePhotos = [
-      {
-        id: 'foto_367',
-        title: 'Foto 360 - IMG_20260618_120603_00_367',
-        url: 'https://cortenge-hub.github.io/WEB3D/02_ASSETS/06_FOTOS360/IMG_20260618_120603_00_367.jpg'
-      },
-      {
-        id: 'foto_362',
-        title: 'Foto 360 - IMG_20260618_120037_00_362',
-        url: 'https://cortenge-hub.github.io/WEB3D/02_ASSETS/06_FOTOS360/IMG_20260618_120037_00_362.jpg'
-      }
-    ];
-
-    let viewers = {};
-    let mainViewer = null;
-    let dynamicMarkers = [];
-
-    const baseHotspots = [
-      {
-        pitch: -8,
-        yaw: 18,
-        type: 'info',
-        cssClass: 'hotspot-label quadro',
-        text: 'QD-01',
-        description: 'Quadro elétrico principal. Clique para abrir informações técnicas.'
-      },
-      {
-        pitch: -3,
-        yaw: 72,
-        type: 'info',
-        cssClass: 'hotspot-label porta',
-        text: 'Próxima sala',
-        description: 'Ponto de navegação para próxima foto 360.'
-      },
-      {
-        pitch: -15,
-        yaw: -38,
-        type: 'info',
-        cssClass: 'hotspot-label alerta',
-        text: 'Atenção',
-        description: 'Área para observação técnica, pendência ou não conformidade.'
-      }
-    ];
-
-    function openTab(tabId, btn) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      btn.classList.add('active');
-
-      setTimeout(() => {
-        Object.values(viewers).forEach(v => {
-          if (v && typeof v.resize === 'function') v.resize();
-        });
-        if (mainViewer && typeof mainViewer.resize === 'function') mainViewer.resize();
-      }, 150);
-    }
-
-    function createViewer(containerId, panoramaUrl, options = {}) {
-      if (viewers[containerId]) {
-        try { viewers[containerId].destroy(); } catch(e) {}
-      }
-      viewers[containerId] = pannellum.viewer(containerId, {
-        type: 'equirectangular',
-        panorama: panoramaUrl,
-        autoLoad: true,
-        compass: true,
-        showZoomCtrl: true,
-        hfov: options.hfov || 100,
-        yaw: options.yaw || 0,
-        pitch: options.pitch || 0,
-        hotSpots: options.hotSpots || []
-      });
-      return viewers[containerId];
-    }
-
-    function fillActivePhotoList() {
-      const list = document.getElementById('activePhotoList');
-      list.innerHTML = '';
-      activePhotos.forEach((photo, index) => {
-        const div = document.createElement('div');
-        div.className = 'photo-item';
-        div.innerHTML = `<strong>${photo.title}</strong><small>${photo.url}</small>`;
-        div.onclick = () => createViewer('viewerTeste1', photo.url);
-        list.appendChild(div);
-        if (index === 0) createViewer('viewerTeste1', photo.url);
-      });
-    }
-
-    function fillPhotoSelect() {
-      const select = document.getElementById('photoSelect');
-      select.innerHTML = '';
-      activePhotos.forEach(photo => {
-        const option = document.createElement('option');
-        option.value = photo.url;
-        option.textContent = photo.title;
-        select.appendChild(option);
-      });
-    }
-
-    function customHotspot(hotSpotDiv, args) {
-      hotSpotDiv.className = args.cssClass || 'hotspot-label';
-      hotSpotDiv.innerHTML = args.text || 'Marcador';
-      hotSpotDiv.onclick = function() {
-        alert((args.text || 'Marcador') + '\n\n' + (args.description || 'Sem descrição.'));
-      };
-    }
-
-    function getHotspots() {
-      const all = [...baseHotspots, ...dynamicMarkers];
-      return all.map(h => ({
-        pitch: h.pitch,
-        yaw: h.yaw,
-        type: h.type || 'info',
-        cssClass: h.cssClass,
-        text: h.text,
-        description: h.description,
-        createTooltipFunc: customHotspot,
-        createTooltipArgs: h
-      }));
-    }
-
-    function loadMainViewer() {
-      const url = document.getElementById('photoSelect').value;
-      const yaw = parseFloat(document.getElementById('yawInput').value || 0);
-      const pitch = parseFloat(document.getElementById('pitchInput').value || 0);
-      if (mainViewer) {
-        try { mainViewer.destroy(); } catch(e) {}
-      }
-      mainViewer = pannellum.viewer('viewerMain', {
-        type: 'equirectangular',
-        panorama: url,
-        autoLoad: true,
-        compass: true,
-        showZoomCtrl: true,
-        yaw,
-        pitch,
-        hfov: 100,
-        hotSpots: getHotspots()
-      });
-      document.getElementById('markerStatus').textContent = 'Visualização carregada com ' + getHotspots().length + ' marcadores.';
-    }
-
-    function addMarkerAtCurrentView() {
-      if (!mainViewer) {
-        document.getElementById('markerStatus').textContent = 'Carregue primeiro a visualização 360.';
-        return;
-      }
-      const yaw = mainViewer.getYaw();
-      const pitch = mainViewer.getPitch();
-      const label = prompt('Nome do marcador:', 'Novo marcador');
-      if (!label) return;
-      dynamicMarkers.push({
-        pitch,
-        yaw,
-        type: 'info',
-        cssClass: 'hotspot-label',
-        text: label,
-        description: 'Marcador criado manualmente no teste. Yaw: ' + yaw.toFixed(2) + ' / Pitch: ' + pitch.toFixed(2)
-      });
-      loadMainViewer();
-    }
-
-    function openGooglePhotos() {
-      const url = document.getElementById('googlePhotosUrl').value.trim();
-      window.open(url, '_blank');
-      document.getElementById('googleStatus').textContent = 'Link aberto em nova aba. Para usar dentro do visualizador 360, prefira exportar/publicar a imagem .jpg diretamente.';
-    }
-
-    function tryLoadGooglePhotos() {
-      const url = document.getElementById('googlePhotosUrl').value.trim();
-      document.getElementById('googleStatus').textContent = 'Tentando carregar. Se ficar preto ou gerar erro, é limitação de URL/CORS do Google Fotos.';
-      try {
-        createViewer('viewerGoogle', url);
-      } catch (err) {
-        document.getElementById('googleStatus').textContent = 'Erro ao carregar: ' + err.message;
-      }
-    }
-
-    function parseCsv(text) {
-      const rows = [];
-      let current = [];
-      let value = '';
-      let inQuotes = false;
-
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const next = text[i + 1];
-        if (char === '"' && inQuotes && next === '"') {
-          value += '"';
-          i++;
-        } else if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          current.push(value);
-          value = '';
-        } else if ((char === '\n' || char === '\r') && !inQuotes) {
-          if (value || current.length) {
-            current.push(value);
-            rows.push(current);
-            current = [];
-            value = '';
-          }
-          if (char === '\r' && next === '\n') i++;
-        } else {
-          value += char;
-        }
-      }
-      if (value || current.length) {
-        current.push(value);
-        rows.push(current);
-      }
-      return rows;
-    }
-
-    function detectUrlColumns(headers) {
-      return headers
-        .map((h, i) => ({ h: String(h || '').toLowerCase(), i }))
-        .filter(col => col.h.includes('foto') || col.h.includes('360') || col.h.includes('url') || col.h.includes('link'))
-        .map(col => col.i);
-    }
-
-    async function loadCsv() {
-      const url = document.getElementById('csvUrl').value.trim();
-      const status = document.getElementById('csvStatus');
-      const table = document.getElementById('csvTable');
-      status.textContent = 'Carregando CSV...';
-      table.innerHTML = '';
-
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        const text = await response.text();
-        const rows = parseCsv(text).filter(r => r.some(c => String(c).trim() !== ''));
-        if (!rows.length) throw new Error('CSV vazio.');
-
-        const headers = rows[0];
-        const urlCols = detectUrlColumns(headers);
-        let html = '<table><thead><tr>' + headers.map(h => `<th>${h || '-'}</th>`).join('') + '<th>Ação</th></tr></thead><tbody>';
-
-        rows.slice(1, 51).forEach((row, idx) => {
-          const possibleUrl = urlCols.map(i => row[i]).find(v => /^https?:\/\//i.test(String(v || '').trim()));
-          html += '<tr>';
-          headers.forEach((_, i) => html += `<td>${row[i] || ''}</td>`);
-          html += '<td>' + (possibleUrl ? `<button onclick="loadCsvPhoto('${encodeURIComponent(possibleUrl)}')">Abrir 360</button>` : '-') + '</td>';
-          html += '</tr>';
-        });
-        html += '</tbody></table>';
-        table.innerHTML = html;
-        status.textContent = `CSV carregado. Linhas: ${rows.length - 1}. Colunas candidatas a URL/foto: ${urlCols.length}.`;
-      } catch (err) {
-        status.textContent = 'Erro ao carregar CSV: ' + err.message + '\nVerifique se a publicação do Google Sheets está ativa e se o navegador permitiu CORS.';
-      }
-    }
-
-    function loadCsvPhoto(encodedUrl) {
-      const url = decodeURIComponent(encodedUrl);
-      openTab('viewer360', document.querySelectorAll('.tab-btn')[3]);
-      const select = document.getElementById('photoSelect');
-      let exists = Array.from(select.options).some(o => o.value === url);
-      if (!exists) {
-        const opt = document.createElement('option');
-        opt.value = url;
-        opt.textContent = 'Foto via CSV';
-        select.appendChild(opt);
-      }
-      select.value = url;
-      loadMainViewer();
-    }
-
-    window.addEventListener('load', () => {
-      fillActivePhotoList();
-      fillPhotoSelect();
-      loadMainViewer();
-    });
-  </script>
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById(btn.dataset.tab).classList.add('active');setTimeout(()=>{if(btn.dataset.tab==='viewer') initMainViewer();},200)}));
+function loadSingleViewer(id,url){try{pannellum.viewer(id,{type:'equirectangular',panorama:url,autoLoad:true,showControls:true,hotSpotDebug:true,crossOrigin:'anonymous'});}catch(e){console.error(e)}}
+function init(){loadSingleViewer('viewerGit1',photos.github1);loadSingleViewer('viewerGit2',photos.github2);fillSceneSelect();renderSchema();renderExamples();}
+function fillSceneSelect(){const sel=document.getElementById('sceneSelect');sel.innerHTML=scenes.map(s=>`<option value="${s.id}">${s.title}</option>`).join('')}
+function initMainViewer(){if(viewerObj) return; changeScene(scenes[0].id)}
+function changeScene(id){const scene=scenes.find(s=>s.id===id)||scenes[0];document.getElementById('sceneSelect').value=scene.id;const hotSpots=(scene.markers||[]).map(m=>({pitch:Number(m.pitch)||0,yaw:Number(m.yaw)||0,cssClass:'custom-hotspot',createTooltipFunc:createHotspot,createTooltipArgs:m,clickHandlerFunc:()=>handleMarker(m)}));viewerObj=pannellum.viewer('mainViewer',{type:'equirectangular',panorama:scene.url,autoLoad:true,showControls:true,hotSpotDebug:true,crossOrigin:'anonymous',hfov:95,pitch:0,yaw:0,hotSpots});document.getElementById('markerInfo').innerHTML=`Cena carregada: <b>${scene.title}</b> | Marcadores: ${hotSpots.length}`;}
+function createHotspot(div,args){const icon=args.icon==='panel'?'⚡':args.icon==='next'?'➜':'ℹ️';const cls=args.icon==='panel'?'panel-icon':args.icon==='next'?'next-icon':'info-icon';div.className='hotspot-icon '+cls;div.innerHTML=`<span>${icon}</span><span class="hotspot-label">${escapeHtml(args.title||'Marcador')}</span>`;div.title=args.title||'Marcador';}
+function handleMarker(m){if(m.target){changeScene(m.target);return;}showModal(m.title||'Marcador',`${m.text||''}\n\nYaw: ${m.yaw}\nPitch: ${m.pitch}\nTipo: ${m.icon||'info'}`)}
+function addDemoMarkers(){if(viewerObj){const id=document.getElementById('sceneSelect').value;changeScene(id)}}
+function showModal(t,txt){document.getElementById('modalTitle').textContent=t;document.getElementById('modalText').textContent=txt;document.getElementById('modal').classList.add('show')}function hideModal(){document.getElementById('modal').classList.remove('show')}function closeModal(e){if(e.target.id==='modal') hideModal()}
+function testGooglePhotos(){const url=document.getElementById('googlePhotoUrl').value;document.getElementById('gphotosFrame').src=url;document.getElementById('gphotosStatus').className='status warn';document.getElementById('gphotosStatus').innerHTML='Se o iframe ficar bloqueado, é comportamento esperado do Google Fotos. Para visualização 360 use URL direta da imagem JPG.'}
+async function loadCsv(){const url=document.getElementById('csvUrl').value.trim();setStatus('csvStatus','Carregando CSV direto...','');try{const r=await fetch(url,{mode:'cors'});if(!r.ok) throw new Error('HTTP '+r.status);const text=await r.text();processCsv(text,'CSV carregado diretamente.');}catch(e){setStatus('csvStatus','Erro no carregamento direto: '+e.message+'. Tente o botão via proxy CORS ou importe o CSV local baixado.','err')}}
+async function loadCsvViaProxy(){const url=document.getElementById('csvUrl').value.trim();const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(url);setStatus('csvStatus','Tentando via proxy CORS público...','warn');try{const r=await fetch(proxy);if(!r.ok) throw new Error('HTTP '+r.status);const text=await r.text();processCsv(text,'CSV carregado via proxy CORS público.');}catch(e){setStatus('csvStatus','Proxy falhou: '+e.message+'. Baixe o CSV no Google Sheets e importe pelo campo de arquivo local.','err')}}
+function loadCsvFile(ev){const f=ev.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>processCsv(reader.result,'CSV local importado com sucesso.');reader.readAsText(f,'utf-8')}
+function processCsv(text,msg){csvRows=parseCsv(text).filter(r=>Object.keys(r).length); if(!csvRows.length){setStatus('csvStatus','CSV lido, mas sem linhas válidas.','err');return;} setStatus('csvStatus',`${msg} Linhas: ${csvRows.length}`,'ok');renderCsvTable(csvRows);mergeCsvIntoScenes(csvRows);}
+function parseCsv(text){const rows=[];let cur=[],val='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&q&&n==='"'){val+='"';i++;continue}if(c==='"'){q=!q;continue}if(c===','&&!q){cur.push(val);val='';continue}if((c==='\n'||c==='\r')&&!q){if(val!==''||cur.length){cur.push(val);rows.push(cur);cur=[];val=''}if(c==='\r'&&n==='\n')i++;continue}val+=c}if(val!==''||cur.length){cur.push(val);rows.push(cur)}const header=(rows.shift()||[]).map(h=>h.trim());return rows.map(r=>{const o={};header.forEach((h,i)=>o[h]=r[i]||'');return o})}
+function renderCsvTable(rows){const keys=Object.keys(rows[0]||{});let html='<table><thead><tr>'+keys.map(k=>`<th>${escapeHtml(k)}</th>`).join('')+'</tr></thead><tbody>';html+=rows.slice(0,80).map(r=>'<tr>'+keys.map(k=>`<td>${linkify(escapeHtml(r[k]||''))}</td>`).join('')+'</tr>').join('');html+='</tbody></table>';document.getElementById('csvTable').innerHTML=html;}
+function mergeCsvIntoScenes(rows){const photoKeys=['url_foto360','foto360','url','imagem','image','panorama'];const idKey=['id','scene','cena'].find(k=>rows[0]&&k in rows[0]);const newScenes=[];rows.forEach((r,idx)=>{const urlKey=photoKeys.find(k=>r[k]); if(!urlKey) return; const tipo=(r.tipo||'').toLowerCase(); if(tipo.includes('marker')||tipo.includes('marcador')) return; newScenes.push({id:(r.id||r.scene||r.cena||'csv'+idx),title:r.titulo||r.title||r.quadro||('Cena CSV '+(idx+1)),url:r[urlKey],markers:[]});});rows.forEach(r=>{const tipo=(r.tipo||'').toLowerCase(); if(!(tipo.includes('marker')||tipo.includes('marcador'))) return; const sid=r.destino_scene||r.scene||r.cena||r.id_cena; const s=newScenes.find(x=>x.id===sid)||scenes.find(x=>x.id===sid); if(s) s.markers.push({yaw:r.yaw,pitch:r.pitch,icon:r.icone||'info',title:r.titulo||r.quadro||'Marcador CSV',text:r.descricao||r.ambiente||'',target:r.destino_scene && r.destino_scene!==sid ? r.destino_scene:''});}); if(newScenes.length){scenes=[...scenes,...newScenes];fillSceneSelect();setStatus('csvStatus',document.getElementById('csvStatus').textContent+' | Cenas CSV adicionadas ao visualizador.','ok')}}
+function renderSchema(){const rows=[['id','Identificador único da cena ou marcador.','foto367'],['tipo','Use cena para foto 360 e marcador para hotspot.','cena / marcador'],['titulo','Nome exibido na interface.','QD Cozinha - 5º Pav'],['url_foto360','URL direta do JPG 360.','https://.../IMG_360.jpg'],['pavimento','Pavimento da obra.','5º pavimento'],['setor','Torre, ala ou setor.','Torre W2'],['quadro','Identificação do quadro elétrico.','QD-COZINHA'],['circuito','Circuito vinculado ao marcador.','5P-IL-01'],['ambiente','Sala ou ambiente.','Restaurante'],['descricao','Observações técnicas.','Quadro junto ao acesso técnico'],['yaw','Coordenada horizontal do hotspot.','65'],['pitch','Coordenada vertical do hotspot.','-8'],['icone','Tipo de ícone: info, panel ou next.','panel'],['destino_scene','Cena de destino para navegação.','foto362'],['google_maps_url','Link opcional para Google Maps/Street View.','https://maps.google.com/...'],['status','Controle de revisão.','ativo']];document.getElementById('schemaRows').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}
+function renderExamples(){const ex=[{id:'foto367',tipo:'cena',titulo:'Foto 360 - Hall Técnico',url_foto360:photos.github1,pavimento:'5º pav',setor:'Torre W2',quadro:'',circuito:'',ambiente:'Hall técnico',descricao:'Cena principal',yaw:'',pitch:'',icone:'',destino_scene:'',google_maps_url:'',status:'ativo'},{id:'mk001',tipo:'marcador',titulo:'QD Cozinha',url_foto360:'',pavimento:'5º pav',setor:'Torre W2',quadro:'QD-COZINHA',circuito:'5P-TUG-01',ambiente:'Restaurante',descricao:'Marcador do quadro elétrico',yaw:'65',pitch:'-8',icone:'panel',destino_scene:'foto367',google_maps_url:'',status:'ativo'}];const keys=Object.keys(ex[0]);document.getElementById('exampleRows').innerHTML='<table><thead><tr>'+keys.map(k=>`<th>${k}</th>`).join('')+'</tr></thead><tbody>'+ex.map(r=>'<tr>'+keys.map(k=>`<td>${escapeHtml(r[k])}</td>`).join('')+'</tr>').join('')+'</tbody></table>'}
+function downloadModeloCsv(){const csv='id,tipo,titulo,url_foto360,pavimento,setor,quadro,circuito,ambiente,descricao,yaw,pitch,icone,destino_scene,google_maps_url,status\nfoto367,cena,Foto 360 - Hall Técnico,'+photos.github1+',5º pav,Torre W2,,,Hall técnico,Cena principal,,,,,,ativo\nmk001,marcador,QD Cozinha,,5º pav,Torre W2,QD-COZINHA,5P-TUG-01,Restaurante,Marcador do quadro elétrico,65,-8,panel,foto367,,ativo\n';const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='modelo_fotos360_quadros_eletricos.csv';a.click();URL.revokeObjectURL(a.href)}
+function setStatus(id,msg,type){const el=document.getElementById(id);el.className='status '+(type||'');el.textContent=msg}function escapeHtml(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}function linkify(s){return s.replace(/(https?:\/\/[^\s<]+)/g,'<a target="_blank" style="color:#7dd3fc" href="$1">$1</a>')}
+window.addEventListener('load',init);
+</script>
 </body>
 </html>
