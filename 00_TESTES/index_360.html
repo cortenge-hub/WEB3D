@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teste Fotos 360 - Quadros Elétricos</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent2: #22c55e;
+      --danger: #ef4444;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      padding: 18px 22px;
+      background: linear-gradient(90deg, #111827, #1e293b);
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px 18px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .tab-btn {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #00111f;
+      border-color: var(--accent);
+    }
+
+    main { padding: 18px; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    }
+
+    .card h2, .card h3 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin: 12px 0 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    textarea { min-height: 78px; resize: vertical; }
+
+    button.action {
+      margin-top: 12px;
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 12px;
+      font-weight: 700;
+      background: var(--accent2);
+      color: #052e16;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #334155;
+      color: var(--text);
+    }
+
+    .viewer {
+      width: 100%;
+      height: calc(100vh - 210px);
+      min-height: 520px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .photo-item {
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      cursor: pointer;
+    }
+
+    .photo-item:hover { border-color: var(--accent); }
+    .photo-item strong { display: block; margin-bottom: 4px; }
+    .photo-item small { color: var(--muted); word-break: break-all; }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    .hotspot-label {
+      background: rgba(15, 23, 42, .92);
+      border: 2px solid #38bdf8;
+      color: white;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0,0,0,.35);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .hotspot-label.quadro { border-color: #22c55e; }
+    .hotspot-label.porta { border-color: #f59e0b; }
+    .hotspot-label.alerta { border-color: #ef4444; }
+
+    .note {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .viewer { height: 520px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Teste Fotos 360 - Quadros Elétricos</h1>
+    <p>Protótipo HTML para testar links 360, Google Fotos, Google Sheets/CSV e marcadores estilo tour virtual.</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="openTab('teste1', this)">Teste 1 - Links ativos</button>
+    <button class="tab-btn" onclick="openTab('teste2', this)">Teste 2 - Google Fotos</button>
+    <button class="tab-btn" onclick="openTab('csv', this)">Google Sheets / CSV</button>
+    <button class="tab-btn" onclick="openTab('viewer360', this)">Visualizador 360 + Marcadores</button>
+  </nav>
+
+  <main>
+    <section id="teste1" class="tab-content active">
+      <div class="grid">
+        <aside class="card">
+          <h2>Links ativos de foto 360</h2>
+          <p class="note">Clique em uma foto para carregar no visualizador Pannellum.</p>
+          <div class="list" id="activePhotoList"></div>
+        </aside>
+        <div id="viewerTeste1" class="viewer"></div>
+      </div>
+    </section>
+
+    <section id="teste2" class="tab-content">
+      <div class="grid">
+        <aside class="card">
+          <h2>Google Fotos</h2>
+          <p class="note">
+            Este link é do visualizador do Google Fotos. Normalmente ele abre como página compartilhada,
+            mas não entrega uma URL direta .jpg com CORS liberado para renderização 360 dentro do HTML.
+          </p>
+          <label>Link Google Fotos</label>
+          <textarea id="googlePhotosUrl">https://photos.google.com/share/AF1QipNklhgqZIQF55--ilEI-Exzw8984sDGJRXlMrPLv3BTQaQJvSef8JRUA1htfqm4GQ/photo/AF1QipMy2aAy4lBEkkZ44Isdu1G5Vdv1Z8vQrLrzs0Ok?key=MkdELWpua3dOcjZXbl9NdXdFVFpCdlJhUHB6WkN3</textarea>
+          <button class="action" onclick="openGooglePhotos()">Abrir link em nova aba</button>
+          <button class="action secondary" onclick="tryLoadGooglePhotos()">Tentar carregar como panorama</button>
+          <div class="status" id="googleStatus"></div>
+        </aside>
+        <div id="viewerGoogle" class="viewer"></div>
+      </div>
+    </section>
+
+    <section id="csv" class="tab-content">
+      <div class="grid">
+        <aside class="card">
+          <h2>Google Sheets / CSV</h2>
+          <p class="note">Carrega o CSV publicado e tenta localizar colunas com URL de foto 360.</p>
+          <label>URL CSV publicado</label>
+          <textarea id="csvUrl">https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=902563468&single=true&output=csv</textarea>
+          <button class="action" onclick="loadCsv()">Carregar CSV</button>
+          <div class="status" id="csvStatus"></div>
+        </aside>
+        <section class="card">
+          <h2>Dados encontrados</h2>
+          <div id="csvTable">Nenhum CSV carregado ainda.</div>
+        </section>
+      </div>
+    </section>
+
+    <section id="viewer360" class="tab-content">
+      <div class="grid">
+        <aside class="card">
+          <h2>Visualizador 360 com marcadores</h2>
+          <p class="note">Protótipo inspirado em Matterport / tour virtual: marcadores dentro da imagem para quadros, portas, alertas e navegação.</p>
+
+          <label>Foto 360</label>
+          <select id="photoSelect"></select>
+
+          <label>Yaw inicial</label>
+          <input id="yawInput" type="number" value="0" />
+
+          <label>Pitch inicial</label>
+          <input id="pitchInput" type="number" value="0" />
+
+          <button class="action" onclick="loadMainViewer()">Carregar visualização</button>
+          <button class="action secondary" onclick="addMarkerAtCurrentView()">Adicionar marcador na posição atual</button>
+
+          <div class="status" id="markerStatus"></div>
+        </aside>
+        <div id="viewerMain" class="viewer"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const activePhotos = [
+      {
+        id: 'foto_367',
+        title: 'Foto 360 - IMG_20260618_120603_00_367',
+        url: 'https://cortenge-hub.github.io/WEB3D/02_ASSETS/06_FOTOS360/IMG_20260618_120603_00_367.jpg'
+      },
+      {
+        id: 'foto_362',
+        title: 'Foto 360 - IMG_20260618_120037_00_362',
+        url: 'https://cortenge-hub.github.io/WEB3D/02_ASSETS/06_FOTOS360/IMG_20260618_120037_00_362.jpg'
+      }
+    ];
+
+    let viewers = {};
+    let mainViewer = null;
+    let dynamicMarkers = [];
+
+    const baseHotspots = [
+      {
+        pitch: -8,
+        yaw: 18,
+        type: 'info',
+        cssClass: 'hotspot-label quadro',
+        text: 'QD-01',
+        description: 'Quadro elétrico principal. Clique para abrir informações técnicas.'
+      },
+      {
+        pitch: -3,
+        yaw: 72,
+        type: 'info',
+        cssClass: 'hotspot-label porta',
+        text: 'Próxima sala',
+        description: 'Ponto de navegação para próxima foto 360.'
+      },
+      {
+        pitch: -15,
+        yaw: -38,
+        type: 'info',
+        cssClass: 'hotspot-label alerta',
+        text: 'Atenção',
+        description: 'Área para observação técnica, pendência ou não conformidade.'
+      }
+    ];
+
+    function openTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+
+      setTimeout(() => {
+        Object.values(viewers).forEach(v => {
+          if (v && typeof v.resize === 'function') v.resize();
+        });
+        if (mainViewer && typeof mainViewer.resize === 'function') mainViewer.resize();
+      }, 150);
+    }
+
+    function createViewer(containerId, panoramaUrl, options = {}) {
+      if (viewers[containerId]) {
+        try { viewers[containerId].destroy(); } catch(e) {}
+      }
+      viewers[containerId] = pannellum.viewer(containerId, {
+        type: 'equirectangular',
+        panorama: panoramaUrl,
+        autoLoad: true,
+        compass: true,
+        showZoomCtrl: true,
+        hfov: options.hfov || 100,
+        yaw: options.yaw || 0,
+        pitch: options.pitch || 0,
+        hotSpots: options.hotSpots || []
+      });
+      return viewers[containerId];
+    }
+
+    function fillActivePhotoList() {
+      const list = document.getElementById('activePhotoList');
+      list.innerHTML = '';
+      activePhotos.forEach((photo, index) => {
+        const div = document.createElement('div');
+        div.className = 'photo-item';
+        div.innerHTML = `<strong>${photo.title}</strong><small>${photo.url}</small>`;
+        div.onclick = () => createViewer('viewerTeste1', photo.url);
+        list.appendChild(div);
+        if (index === 0) createViewer('viewerTeste1', photo.url);
+      });
+    }
+
+    function fillPhotoSelect() {
+      const select = document.getElementById('photoSelect');
+      select.innerHTML = '';
+      activePhotos.forEach(photo => {
+        const option = document.createElement('option');
+        option.value = photo.url;
+        option.textContent = photo.title;
+        select.appendChild(option);
+      });
+    }
+
+    function customHotspot(hotSpotDiv, args) {
+      hotSpotDiv.className = args.cssClass || 'hotspot-label';
+      hotSpotDiv.innerHTML = args.text || 'Marcador';
+      hotSpotDiv.onclick = function() {
+        alert((args.text || 'Marcador') + '\n\n' + (args.description || 'Sem descrição.'));
+      };
+    }
+
+    function getHotspots() {
+      const all = [...baseHotspots, ...dynamicMarkers];
+      return all.map(h => ({
+        pitch: h.pitch,
+        yaw: h.yaw,
+        type: h.type || 'info',
+        cssClass: h.cssClass,
+        text: h.text,
+        description: h.description,
+        createTooltipFunc: customHotspot,
+        createTooltipArgs: h
+      }));
+    }
+
+    function loadMainViewer() {
+      const url = document.getElementById('photoSelect').value;
+      const yaw = parseFloat(document.getElementById('yawInput').value || 0);
+      const pitch = parseFloat(document.getElementById('pitchInput').value || 0);
+      if (mainViewer) {
+        try { mainViewer.destroy(); } catch(e) {}
+      }
+      mainViewer = pannellum.viewer('viewerMain', {
+        type: 'equirectangular',
+        panorama: url,
+        autoLoad: true,
+        compass: true,
+        showZoomCtrl: true,
+        yaw,
+        pitch,
+        hfov: 100,
+        hotSpots: getHotspots()
+      });
+      document.getElementById('markerStatus').textContent = 'Visualização carregada com ' + getHotspots().length + ' marcadores.';
+    }
+
+    function addMarkerAtCurrentView() {
+      if (!mainViewer) {
+        document.getElementById('markerStatus').textContent = 'Carregue primeiro a visualização 360.';
+        return;
+      }
+      const yaw = mainViewer.getYaw();
+      const pitch = mainViewer.getPitch();
+      const label = prompt('Nome do marcador:', 'Novo marcador');
+      if (!label) return;
+      dynamicMarkers.push({
+        pitch,
+        yaw,
+        type: 'info',
+        cssClass: 'hotspot-label',
+        text: label,
+        description: 'Marcador criado manualmente no teste. Yaw: ' + yaw.toFixed(2) + ' / Pitch: ' + pitch.toFixed(2)
+      });
+      loadMainViewer();
+    }
+
+    function openGooglePhotos() {
+      const url = document.getElementById('googlePhotosUrl').value.trim();
+      window.open(url, '_blank');
+      document.getElementById('googleStatus').textContent = 'Link aberto em nova aba. Para usar dentro do visualizador 360, prefira exportar/publicar a imagem .jpg diretamente.';
+    }
+
+    function tryLoadGooglePhotos() {
+      const url = document.getElementById('googlePhotosUrl').value.trim();
+      document.getElementById('googleStatus').textContent = 'Tentando carregar. Se ficar preto ou gerar erro, é limitação de URL/CORS do Google Fotos.';
+      try {
+        createViewer('viewerGoogle', url);
+      } catch (err) {
+        document.getElementById('googleStatus').textContent = 'Erro ao carregar: ' + err.message;
+      }
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let current = [];
+      let value = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+        if (char === '"' && inQuotes && next === '"') {
+          value += '"';
+          i++;
+        } else if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          current.push(value);
+          value = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (value || current.length) {
+            current.push(value);
+            rows.push(current);
+            current = [];
+            value = '';
+          }
+          if (char === '\r' && next === '\n') i++;
+        } else {
+          value += char;
+        }
+      }
+      if (value || current.length) {
+        current.push(value);
+        rows.push(current);
+      }
+      return rows;
+    }
+
+    function detectUrlColumns(headers) {
+      return headers
+        .map((h, i) => ({ h: String(h || '').toLowerCase(), i }))
+        .filter(col => col.h.includes('foto') || col.h.includes('360') || col.h.includes('url') || col.h.includes('link'))
+        .map(col => col.i);
+    }
+
+    async function loadCsv() {
+      const url = document.getElementById('csvUrl').value.trim();
+      const status = document.getElementById('csvStatus');
+      const table = document.getElementById('csvTable');
+      status.textContent = 'Carregando CSV...';
+      table.innerHTML = '';
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const text = await response.text();
+        const rows = parseCsv(text).filter(r => r.some(c => String(c).trim() !== ''));
+        if (!rows.length) throw new Error('CSV vazio.');
+
+        const headers = rows[0];
+        const urlCols = detectUrlColumns(headers);
+        let html = '<table><thead><tr>' + headers.map(h => `<th>${h || '-'}</th>`).join('') + '<th>Ação</th></tr></thead><tbody>';
+
+        rows.slice(1, 51).forEach((row, idx) => {
+          const possibleUrl = urlCols.map(i => row[i]).find(v => /^https?:\/\//i.test(String(v || '').trim()));
+          html += '<tr>';
+          headers.forEach((_, i) => html += `<td>${row[i] || ''}</td>`);
+          html += '<td>' + (possibleUrl ? `<button onclick="loadCsvPhoto('${encodeURIComponent(possibleUrl)}')">Abrir 360</button>` : '-') + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        table.innerHTML = html;
+        status.textContent = `CSV carregado. Linhas: ${rows.length - 1}. Colunas candidatas a URL/foto: ${urlCols.length}.`;
+      } catch (err) {
+        status.textContent = 'Erro ao carregar CSV: ' + err.message + '\nVerifique se a publicação do Google Sheets está ativa e se o navegador permitiu CORS.';
+      }
+    }
+
+    function loadCsvPhoto(encodedUrl) {
+      const url = decodeURIComponent(encodedUrl);
+      openTab('viewer360', document.querySelectorAll('.tab-btn')[3]);
+      const select = document.getElementById('photoSelect');
+      let exists = Array.from(select.options).some(o => o.value === url);
+      if (!exists) {
+        const opt = document.createElement('option');
+        opt.value = url;
+        opt.textContent = 'Foto via CSV';
+        select.appendChild(opt);
+      }
+      select.value = url;
+      loadMainViewer();
+    }
+
+    window.addEventListener('load', () => {
+      fillActivePhotoList();
+      fillPhotoSelect();
+      loadMainViewer();
+    });
+  </script>
+</body>
+</html>
