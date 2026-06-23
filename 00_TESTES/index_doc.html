@@ -3,19 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teste CRUD - Documentos Google Sheets CSV</title>
+  <title>WEB3D - Cadastro de Documentos</title>
   <style>
     :root {
-      --bg: #f4f6f8;
-      --card: #ffffff;
+      --bg: #eef2f6;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --sidebar: #102a43;
+      --sidebar-2: #173b5c;
       --primary: #1f4e79;
-      --primary-dark: #163a59;
+      --primary-2: #2563eb;
       --accent: #f2b705;
-      --border: #d8dee6;
-      --text: #1f2933;
-      --muted: #6b7280;
+      --text: #17212b;
+      --muted: #64748b;
+      --border: #d9e2ec;
       --danger: #b42318;
       --success: #0f766e;
+      --warning: #b7791f;
+      --shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
+      --radius: 14px;
     }
 
     * { box-sizing: border-box; }
@@ -27,472 +33,685 @@
       color: var(--text);
     }
 
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      background: linear-gradient(180deg, var(--sidebar), var(--sidebar-2));
       color: #fff;
-      padding: 22px 28px;
-      border-bottom: 5px solid var(--accent);
+      padding: 22px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
     }
 
-    header h1 {
-      margin: 0 0 6px;
-      font-size: 24px;
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.16);
+      margin-bottom: 18px;
     }
 
-    header p {
-      margin: 0;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    main {
-      max-width: 1280px;
-      margin: 24px auto;
-      padding: 0 18px 32px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
+    .brand-icon {
+      width: 42px;
+      height: 42px;
       border-radius: 12px;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
-      margin-bottom: 20px;
+      background: var(--accent);
+      color: #102a43;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .brand h1 {
+      font-size: 17px;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .brand small { opacity: .78; }
+
+    .nav-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      opacity: .65;
+      margin: 18px 8px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 10px;
+      color: rgba(255,255,255,.86);
+      text-decoration: none;
+      font-size: 14px;
+      margin: 3px 0;
+      cursor: pointer;
+    }
+
+    .nav-item.active, .nav-item:hover {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 28px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h2 { margin: 0 0 4px; font-size: 22px; color: var(--primary); }
+    header p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+
+    .content {
+      padding: 22px 28px 36px;
+      max-width: 1500px;
+      width: 100%;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .kpi span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .kpi strong { font-size: 24px; color: var(--primary); }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
       overflow: hidden;
     }
 
-    .card-title {
-      padding: 16px 20px;
+    .panel-head {
+      padding: 15px 18px;
       border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    .card-title h2 {
-      margin: 0;
-      font-size: 18px;
-      color: var(--primary);
-    }
-
-    .status {
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .panel-head h3 { margin: 0; font-size: 16px; color: var(--primary); }
+    .panel-head small { color: var(--muted); }
+    .panel-body { padding: 18px; }
 
     .form-grid {
-      padding: 20px;
       display: grid;
       grid-template-columns: repeat(4, minmax(180px, 1fr));
       gap: 14px;
     }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .field.full { grid-column: span 4; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
     .field.double { grid-column: span 2; }
 
-    label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #344054;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
+    label { font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
 
-    input, textarea, select {
+    input, select, textarea {
       width: 100%;
-      padding: 10px 11px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
+      padding: 10px 11px;
       font-size: 14px;
       background: #fff;
       color: var(--text);
+      outline: none;
     }
 
-    textarea {
-      min-height: 74px;
-      resize: vertical;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: 2px solid rgba(31, 78, 121, 0.18);
-      border-color: var(--primary);
-    }
-
-    .actions {
-      padding: 0 20px 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.05s ease, opacity 0.2s ease;
-    }
-
-    button:active { transform: translateY(1px); }
-
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-secondary { background: #e5e7eb; color: #111827; }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-warning { background: var(--accent); color: #1f2933; }
-    .btn-outline { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary-2); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+    textarea { min-height: 78px; resize: vertical; }
 
     .toolbar {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
+      margin-top: 16px;
     }
 
-    .toolbar-left, .toolbar-right {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .button-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      display: inline-flex;
+      gap: 8px;
       align-items: center;
+      justify-content: center;
     }
 
-    .search {
-      min-width: 280px;
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-secondary { background: #e2e8f0; color: #1e293b; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-warning { background: var(--warning); color: #fff; }
+    button:hover { filter: brightness(.96); }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 220px 180px;
+      gap: 12px;
+      align-items: end;
+      width: 100%;
     }
 
     .table-wrap {
-      width: 100%;
       overflow: auto;
       max-height: 520px;
+      border-top: 1px solid var(--border);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1040px;
-    }
-
-    th, td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      font-size: 13px;
-      vertical-align: top;
-    }
-
-    th {
+    table { width: 100%; border-collapse: collapse; min-width: 1050px; }
+    thead th {
       position: sticky;
       top: 0;
-      background: #eef3f8;
-      color: #243b53;
+      background: #eaf1f8;
+      color: #163a59;
       z-index: 1;
       font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      letter-spacing: .04em;
     }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; font-size: 13px; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody tr.selected { background: #fff7db; }
 
-    tbody tr {
-      cursor: pointer;
-    }
-
-    tbody tr:hover {
-      background: #f8fafc;
-    }
-
-    tbody tr.selected {
-      background: #fff7d6;
-      outline: 2px solid var(--accent);
-      outline-offset: -2px;
-    }
-
-    .message {
-      margin: 0 20px 18px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      display: none;
-    }
-
-    .message.show { display: block; }
-    .message.info { background: #e0f2fe; color: #075985; }
-    .message.success { background: #ccfbf1; color: #115e59; }
-    .message.warning { background: #fef3c7; color: #92400e; }
-    .message.error { background: #fee2e2; color: var(--danger); }
-
-    .small-note {
-      padding: 0 20px 16px;
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 9px;
       font-size: 12px;
-      color: var(--muted);
+      background: #e2e8f0;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+
+    .link-cell a { color: var(--primary-2); text-decoration: none; font-weight: 700; }
+    .link-cell a:hover { text-decoration: underline; }
+
+    .notice {
+      border-left: 4px solid var(--accent);
+      background: #fffbea;
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: #5f4700;
+      font-size: 13px;
       line-height: 1.45;
     }
 
-    @media (max-width: 920px) {
-      .form-grid { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
-      .field.full, .field.double { grid-column: span 2; }
+    .status-line { color: var(--muted); font-size: 13px; }
+
+    .mobile-menu { display: none; }
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 1fr; }
+      aside { position: fixed; inset: 0 auto 0 0; width: 280px; transform: translateX(-100%); transition: .25s; z-index: 30; }
+      aside.open { transform: translateX(0); }
+      .mobile-menu { display: inline-flex; }
+      header { top: 0; }
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      .form-grid { grid-template-columns: repeat(2, 1fr); }
+      .filters { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 560px) {
-      header { padding: 18px; }
+    @media (max-width: 640px) {
+      header { align-items: flex-start; flex-direction: column; padding: 16px; }
+      .content { padding: 16px; }
+      .cards { grid-template-columns: 1fr; }
       .form-grid { grid-template-columns: 1fr; }
-      .field.full, .field.double { grid-column: span 1; }
-      .search { min-width: 100%; }
-      .toolbar { align-items: stretch; }
-      .toolbar-left, .toolbar-right { width: 100%; }
+      .field.double { grid-column: auto; }
+      .button-group, .toolbar { width: 100%; }
       button { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Teste de Cadastro / Alteração - 06_DOCUMENTOS</h1>
-    <p>Protótipo HTML para GitHub Pages com leitura de CSV publicado no Google Sheets.</p>
-  </header>
-
-  <main>
-    <section class="card">
-      <div class="card-title">
-        <h2>Formulário do documento</h2>
-        <span class="status" id="formStatus">Nenhuma linha selecionada</span>
+  <div class="app">
+    <aside id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">3D</div>
+        <div>
+          <h1>WEB3D Quadros Elétricos</h1>
+          <small>Cadastro e base técnica</small>
+        </div>
       </div>
 
-      <form id="docForm">
-        <div class="form-grid">
-          <div class="field">
-            <label for="ID_DOCUMENTO">ID Documento</label>
-            <input id="ID_DOCUMENTO" name="ID_DOCUMENTO" placeholder="Ex.: DOC-001" />
-          </div>
+      <div class="nav-title">Cadastros</div>
+      <a class="nav-item">▣ Quadros</a>
+      <a class="nav-item">⎍ Circuitos</a>
+      <a class="nav-item">⌂ Pavimentos</a>
+      <a class="nav-item">⌖ Plantas</a>
+      <a class="nav-item">◎ Fotos 360</a>
+      <a class="nav-item active">📄 Documentos</a>
+      <a class="nav-item">⌘ Locais</a>
+      <a class="nav-item">⬡ Objetos 3D</a>
+      <a class="nav-item">☑ Eventos</a>
 
-          <div class="field">
-            <label for="ID_QUADRO">ID Quadro</label>
-            <input id="ID_QUADRO" name="ID_QUADRO" placeholder="Ex.: QD-12E2-001" />
-          </div>
-
-          <div class="field">
-            <label for="TIPO_DOCUMENTO">Tipo Documento</label>
-            <select id="TIPO_DOCUMENTO" name="TIPO_DOCUMENTO">
-              <option value="">Selecione...</option>
-              <option>Diagrama</option>
-              <option>DataBook</option>
-              <option>Manual</option>
-              <option>Memorial</option>
-              <option>Relatório</option>
-              <option>Laudo</option>
-              <option>Foto</option>
-              <option>Outro</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="REVISAO">Revisão</label>
-            <input id="REVISAO" name="REVISAO" placeholder="Ex.: R00" />
-          </div>
-
-          <div class="field double">
-            <label for="DESCRICAO">Descrição</label>
-            <input id="DESCRICAO" name="DESCRICAO" placeholder="Descrição do documento" />
-          </div>
-
-          <div class="field">
-            <label for="DATA">Data</label>
-            <input id="DATA" name="DATA" type="date" />
-          </div>
-
-          <div class="field">
-            <label for="LINK">Link</label>
-            <input id="LINK" name="LINK" placeholder="URL ou caminho do arquivo" />
-          </div>
-
-          <div class="field full">
-            <label for="OBS">Observações</label>
-            <textarea id="OBS" name="OBS" placeholder="Observações complementares"></textarea>
-          </div>
-        </div>
-
-        <div id="message" class="message"></div>
-
-        <div class="actions">
-          <button type="button" class="btn-secondary" id="btnNovo">Novo / Limpar</button>
-          <button type="button" class="btn-success" id="btnCadastrar">Cadastrar novo</button>
-          <button type="button" class="btn-warning" id="btnAlterar">Alterar selecionado</button>
-          <button type="button" class="btn-outline" id="btnCopiarJson">Copiar JSON do formulário</button>
-        </div>
-      </form>
-
-      <div class="small-note">
-        Nesta versão inicial, os botões simulam a inclusão/alteração apenas na tela. A gravação definitiva na planilha será feita depois via backend/Vercel ou outro endpoint seguro.
+      <div class="nav-title">Status</div>
+      <div class="notice">
+        Esta versão lê o CSV público e simula cadastro/alteração no navegador. A gravação real será conectada depois via Vercel.
       </div>
+    </aside>
+
+    <section class="main">
+      <header>
+        <div>
+          <h2>Cadastro de Documentos</h2>
+          <p>Teste de layout CRUD usando Google Sheets publicado como CSV.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-secondary mobile-menu" onclick="toggleSidebar()">☰ Menu</button>
+          <button class="btn-secondary" onclick="loadCsv()">↻ Recarregar CSV</button>
+          <button class="btn-primary" onclick="newRecord()">＋ Novo documento</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="cards">
+          <div class="kpi"><span>Total de registros</span><strong id="kpiTotal">0</strong></div>
+          <div class="kpi"><span>Documentos filtrados</span><strong id="kpiFiltered">0</strong></div>
+          <div class="kpi"><span>Tipos encontrados</span><strong id="kpiTipos">0</strong></div>
+          <div class="kpi"><span>Registro selecionado</span><strong id="kpiSelected">-</strong></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Formulário de cadastro / alteração</h3>
+              <small>Selecione uma linha da tabela para preencher automaticamente.</small>
+            </div>
+            <span class="status-line" id="formMode">Modo: novo cadastro</span>
+          </div>
+          <div class="panel-body">
+            <form id="docForm" onsubmit="event.preventDefault(); saveNew();">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="ID_DOCUMENTO">ID_DOCUMENTO</label>
+                  <input id="ID_DOCUMENTO" name="ID_DOCUMENTO" placeholder="DOC-003" />
+                </div>
+                <div class="field">
+                  <label for="ID_QUADRO">ID_QUADRO</label>
+                  <input id="ID_QUADRO" name="ID_QUADRO" placeholder="QD-12E2-001" />
+                </div>
+                <div class="field">
+                  <label for="TIPO_DOCUMENTO">TIPO_DOCUMENTO</label>
+                  <select id="TIPO_DOCUMENTO" name="TIPO_DOCUMENTO">
+                    <option value="">Selecione...</option>
+                    <option>Diagrama</option>
+                    <option>DataBook</option>
+                    <option>Memorial</option>
+                    <option>Manual</option>
+                    <option>Laudo</option>
+                    <option>Projeto</option>
+                    <option>As Built</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="REVISAO">REVISAO</label>
+                  <input id="REVISAO" name="REVISAO" placeholder="R00" />
+                </div>
+                <div class="field double">
+                  <label for="DESCRICAO">DESCRICAO</label>
+                  <input id="DESCRICAO" name="DESCRICAO" placeholder="Descrição do documento" />
+                </div>
+                <div class="field">
+                  <label for="DATA">DATA</label>
+                  <input type="date" id="DATA" name="DATA" />
+                </div>
+                <div class="field">
+                  <label for="STATUS">STATUS</label>
+                  <select id="STATUS" name="STATUS">
+                    <option>Ativo</option>
+                    <option>Em revisão</option>
+                    <option>Substituído</option>
+                    <option>Cancelado</option>
+                  </select>
+                </div>
+                <div class="field full">
+                  <label for="LINK">LINK</label>
+                  <input id="LINK" name="LINK" placeholder="02_ASSETS/07_DOCUMENTOS_PDF/arquivo.pdf ou URL" />
+                </div>
+                <div class="field full">
+                  <label for="OBS">OBS</label>
+                  <textarea id="OBS" name="OBS" placeholder="Observações técnicas, pendências, histórico de revisão..."></textarea>
+                </div>
+              </div>
+
+              <div class="toolbar">
+                <div class="button-group">
+                  <button type="button" class="btn-primary" onclick="newRecord()">＋ Novo</button>
+                  <button type="submit" class="btn-success">✓ Cadastrar novo</button>
+                  <button type="button" class="btn-warning" onclick="updateSelected()">↻ Alterar existente</button>
+                  <button type="button" class="btn-secondary" onclick="duplicateSelected()">⧉ Duplicar</button>
+                  <button type="button" class="btn-danger" onclick="deleteSelected()">🗑 Excluir local</button>
+                </div>
+                <span class="status-line" id="actionStatus">Aguardando dados...</span>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Tabela carregada do Google Sheets CSV</h3>
+              <small>Clique em uma linha para editar no formulário acima.</small>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="filters">
+              <div class="field">
+                <label for="searchInput">Busca rápida</label>
+                <input id="searchInput" placeholder="Buscar por ID, quadro, descrição, revisão..." oninput="applyFilters()" />
+              </div>
+              <div class="field">
+                <label for="typeFilter">Filtro por tipo</label>
+                <select id="typeFilter" onchange="applyFilters()"><option value="">Todos</option></select>
+              </div>
+              <div class="field">
+                <label for="statusFilter">Filtro por status</label>
+                <select id="statusFilter" onchange="applyFilters()">
+                  <option value="">Todos</option>
+                  <option>Ativo</option>
+                  <option>Em revisão</option>
+                  <option>Substituído</option>
+                  <option>Cancelado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
     </section>
-
-    <section class="card">
-      <div class="card-title">
-        <h2>Tabela carregada do CSV</h2>
-        <span class="status" id="tableStatus">Aguardando carregamento...</span>
-      </div>
-
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <button type="button" class="btn-primary" id="btnCarregar">Carregar / Recarregar CSV</button>
-          <button type="button" class="btn-secondary" id="btnLimparFiltro">Limpar filtro</button>
-        </div>
-        <div class="toolbar-right">
-          <input class="search" id="searchInput" placeholder="Filtrar na tabela..." />
-        </div>
-      </div>
-
-      <div class="table-wrap">
-        <table id="dataTable">
-          <thead></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+  </div>
 
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=858500309&single=true&output=csv';
+    const API_URL = ''; // Futuro endpoint Vercel. Exemplo: https://seu-projeto.vercel.app/api/documentos
 
-    const fields = ['ID_DOCUMENTO', 'ID_QUADRO', 'TIPO_DOCUMENTO', 'DESCRICAO', 'LINK', 'REVISAO', 'DATA', 'OBS'];
-    let allRows = [];
-    let filteredRows = [];
-    let selectedIndex = null;
+    let records = [];
+    let filteredRecords = [];
+    let headers = [];
+    let selectedIndex = -1;
 
-    const form = document.getElementById('docForm');
-    const formStatus = document.getElementById('formStatus');
-    const tableStatus = document.getElementById('tableStatus');
-    const message = document.getElementById('message');
-    const thead = document.querySelector('#dataTable thead');
-    const tbody = document.querySelector('#dataTable tbody');
-    const searchInput = document.getElementById('searchInput');
-
-    function showMessage(text, type = 'info') {
-      message.textContent = text;
-      message.className = `message show ${type}`;
-      window.clearTimeout(showMessage.timer);
-      showMessage.timer = window.setTimeout(() => {
-        message.className = 'message';
-      }, 4500);
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
     }
 
-    function parseCSV(text) {
+    function parseCsv(text) {
       const rows = [];
-      let current = '';
       let row = [];
-      let insideQuotes = false;
+      let cell = '';
+      let inQuotes = false;
 
       for (let i = 0; i < text.length; i++) {
         const char = text[i];
         const next = text[i + 1];
 
-        if (char === '"' && insideQuotes && next === '"') {
-          current += '"';
+        if (char === '"' && inQuotes && next === '"') {
+          cell += '"';
           i++;
         } else if (char === '"') {
-          insideQuotes = !insideQuotes;
-        } else if (char === ',' && !insideQuotes) {
-          row.push(current);
-          current = '';
-        } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          row.push(cell.trim());
+          cell = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (cell || row.length) {
+            row.push(cell.trim());
+            rows.push(row);
+            row = [];
+            cell = '';
+          }
           if (char === '\r' && next === '\n') i++;
-          row.push(current);
-          if (row.some(cell => cell.trim() !== '')) rows.push(row);
-          row = [];
-          current = '';
         } else {
-          current += char;
+          cell += char;
         }
       }
-
-      if (current || row.length) {
-        row.push(current);
+      if (cell || row.length) {
+        row.push(cell.trim());
         rows.push(row);
       }
-
       return rows;
     }
 
-    function csvToObjects(csvText) {
-      const rows = parseCSV(csvText.trim());
-      const headers = rows.shift().map(h => h.trim());
-      return rows.map((row, index) => {
-        const obj = { __index: index };
-        headers.forEach((header, i) => {
-          obj[header] = row[i] ? row[i].trim() : '';
+    async function loadCsv() {
+      setStatus('Carregando dados do CSV...');
+      try {
+        const response = await fetch(CSV_URL + '&cacheBust=' + Date.now());
+        if (!response.ok) throw new Error('Erro HTTP ' + response.status);
+        const text = await response.text();
+        const rows = parseCsv(text).filter(r => r.some(c => c !== ''));
+        headers = rows.shift() || [];
+
+        records = rows.map((row, index) => {
+          const item = { __index: index };
+          headers.forEach((h, i) => item[h] = row[i] || '');
+          if (!item.STATUS) item.STATUS = 'Ativo';
+          return item;
         });
-        return obj;
-      });
+
+        if (!headers.includes('STATUS')) headers.push('STATUS');
+        selectedIndex = -1;
+        buildTypeFilter();
+        applyFilters();
+        newRecord(false);
+        setStatus('CSV carregado com sucesso.');
+      } catch (error) {
+        console.error(error);
+        setStatus('Erro ao carregar CSV. Verifique se o link está publicado.', true);
+      }
     }
 
-    function formatDateForInput(value) {
-      if (!value) return '';
-      const clean = value.trim();
-      if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) return clean;
-      const match = clean.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      if (match) return `${match[3]}-${match[2]}-${match[1]}`;
-      return clean;
+    function buildTypeFilter() {
+      const typeFilter = document.getElementById('typeFilter');
+      const tipos = [...new Set(records.map(r => r.TIPO_DOCUMENTO).filter(Boolean))].sort();
+      typeFilter.innerHTML = '<option value="">Todos</option>' + tipos.map(t => `<option>${escapeHtml(t)}</option>`).join('');
+    }
+
+    function applyFilters() {
+      const term = document.getElementById('searchInput').value.toLowerCase().trim();
+      const type = document.getElementById('typeFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      filteredRecords = records.filter(item => {
+        const text = headers.map(h => item[h] || '').join(' ').toLowerCase();
+        const matchTerm = !term || text.includes(term);
+        const matchType = !type || item.TIPO_DOCUMENTO === type;
+        const matchStatus = !status || item.STATUS === status;
+        return matchTerm && matchType && matchStatus;
+      });
+
+      renderTable();
+      updateKpis();
+    }
+
+    function renderTable() {
+      const head = document.getElementById('tableHead');
+      const body = document.getElementById('tableBody');
+      const visibleHeaders = ['ID_DOCUMENTO', 'ID_QUADRO', 'TIPO_DOCUMENTO', 'DESCRICAO', 'REVISAO', 'DATA', 'STATUS', 'LINK', 'OBS'];
+
+      head.innerHTML = '<tr>' + visibleHeaders.map(h => `<th>${escapeHtml(h)}</th>`).join('') + '</tr>';
+      body.innerHTML = filteredRecords.map(item => {
+        const originalIndex = records.indexOf(item);
+        return `<tr class="${originalIndex === selectedIndex ? 'selected' : ''}" onclick="selectRecord(${originalIndex})">` +
+          visibleHeaders.map(h => `<td class="${h === 'LINK' ? 'link-cell' : ''}">${formatCell(h, item[h])}</td>`).join('') +
+          '</tr>';
+      }).join('');
+    }
+
+    function formatCell(header, value) {
+      const safe = escapeHtml(value || '');
+      if (header === 'TIPO_DOCUMENTO' || header === 'STATUS') return `<span class="tag">${safe}</span>`;
+      if (header === 'LINK' && value) return `<a href="${safe}" target="_blank" rel="noopener">Abrir</a>`;
+      return safe;
+    }
+
+    function selectRecord(index) {
+      selectedIndex = index;
+      const item = records[index];
+      fillForm(item);
+      document.getElementById('formMode').textContent = 'Modo: alteração do registro ' + (item.ID_DOCUMENTO || '-');
+      document.getElementById('kpiSelected').textContent = item.ID_DOCUMENTO || '-';
+      renderTable();
+      setStatus('Registro selecionado para edição.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function fillForm(item) {
+      ['ID_DOCUMENTO','ID_QUADRO','TIPO_DOCUMENTO','DESCRICAO','LINK','REVISAO','DATA','OBS','STATUS'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = item[id] || '';
+      });
     }
 
     function getFormData() {
       const data = {};
-      fields.forEach(field => {
-        data[field] = document.getElementById(field).value.trim();
+      ['ID_DOCUMENTO','ID_QUADRO','TIPO_DOCUMENTO','DESCRICAO','LINK','REVISAO','DATA','OBS','STATUS'].forEach(id => {
+        data[id] = document.getElementById(id).value.trim();
       });
       return data;
     }
 
-    function setFormData(row) {
-      fields.forEach(field => {
-        const el = document.getElementById(field);
-        el.value = field === 'DATA' ? formatDateForInput(row[field] || '') : (row[field] || '');
-      });
+    function newRecord(clearStatus = true) {
+      selectedIndex = -1;
+      document.getElementById('docForm').reset();
+      document.getElementById('STATUS').value = 'Ativo';
+      document.getElementById('formMode').textContent = 'Modo: novo cadastro';
+      document.getElementById('kpiSelected').textContent = '-';
+      renderTable();
+      if (clearStatus) setStatus('Formulário limpo para novo cadastro.');
     }
 
-    function clearForm() {
-      form.reset();
-      selectedIndex = null;
-      document.querySelectorAll('tbody tr').forEach(tr => tr.classList.remove('selected'));
-      formStatus.textContent = 'Novo cadastro em branco';
-      showMessage('Formulário limpo. Preencha os dados para cadastrar um novo documento.', 'info');
+    function saveNew() {
+      const data = getFormData();
+      if (!data.ID_DOCUMENTO) {
+        data.ID_DOCUMENTO = generateNextId();
+        document.getElementById('ID_DOCUMENTO').value = data.ID_DOCUMENTO;
+      }
+      records.push(data);
+      buildTypeFilter();
+      applyFilters();
+      setStatus('Novo registro inserido localmente. Depois será enviado ao Google Sheets via Vercel.');
+      // Futuro: await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) })
     }
 
-    function renderTable(rows) {
-      filteredRows = rows;
-      thead.innerHTML = `<tr>${fields.map(h => `<th>${h}</th>`).join('')}</tr>`;
-      tbody.innerHTML = '';
-
-      rows.forEach((row, visibleIndex) => {
-        const tr = document.createElement('tr');
-        tr.dataset.visibleIndex = visibleIndex;
-        tr.dataset.originalIndex = row.__index;
-        tr.innerHTML = fields.map(field => `<td>${escapeHtml(row[field] || '')}</td>`).join('');
-        tr.addEventListener('click', () => selectRow(visibleIndex, tr));
-        tbody.appendChild(tr);
-      });
-
-      tableStatus.textContent = `${rows.length} registro(s) exibido(s) de ${allRows.length} carregado(s)`;
+    function updateSelected() {
+      if (selectedIndex < 0) {
+        setStatus('Selecione uma linha antes de alterar.', true);
+        return;
+      }
+      records[selectedIndex] = { ...records[selectedIndex], ...getFormData() };
+      buildTypeFilter();
+      applyFilters();
+      setStatus('Registro alterado localmente. Depois será atualizado no Google Sheets via Vercel.');
+      // Futuro: await fetch(API_URL + '/' + ID, { method: 'PUT', body: JSON.stringify(data) })
     }
 
-    function selectRow(visibleIndex, tr) {
-      const row = filteredRows[visibleIndex];
-      selectedIndex = row.__index;
-      document.querySelectorAll('tbody tr').forEach(item => item.classList.remove('selected'));
-      tr.classList.add('selected');
-      setFormData(row);
-      formStatus.textContent = `Linha selecionada: ${row.ID_DOCUMENTO || 'sem ID'}`;
-      showMessage('Linha carregada no formulário. Agora você pode alterar os dados.', 'success');
+    function duplicateSelected() {
+      if (selectedIndex < 0) {
+        setStatus('Selecione uma linha antes de duplicar.', true);
+        return;
+      }
+      const copy = { ...records[selectedIndex], ID_DOCUMENTO: generateNextId(), REVISAO: 'R00' };
+      records.push(copy);
+      fillForm(copy);
+      selectedIndex = records.length - 1;
+      buildTypeFilter();
+      applyFilters();
+      setStatus('Registro duplicado localmente.');
+    }
+
+    function deleteSelected() {
+      if (selectedIndex < 0) {
+        setStatus('Selecione uma linha antes de excluir.', true);
+        return;
+      }
+      const id = records[selectedIndex].ID_DOCUMENTO || 'registro';
+      if (!confirm('Excluir localmente o registro ' + id + '?')) return;
+      records.splice(selectedIndex, 1);
+      newRecord(false);
+      buildTypeFilter();
+      applyFilters();
+      setStatus('Registro excluído localmente. Depois será removido/baixado no Google Sheets via Vercel.');
+    }
+
+    function generateNextId() {
+      const nums = records
+        .map(r => (r.ID_DOCUMENTO || '').match(/DOC-(\d+)/))
+        .filter(Boolean)
+        .map(m => Number(m[1]));
+      const next = (Math.max(0, ...nums) + 1).toString().padStart(3, '0');
+      return 'DOC-' + next;
+    }
+
+    function updateKpis() {
+      document.getElementById('kpiTotal').textContent = records.length;
+      document.getElementById('kpiFiltered').textContent = filteredRecords.length;
+      document.getElementById('kpiTipos').textContent = new Set(records.map(r => r.TIPO_DOCUMENTO).filter(Boolean)).size;
+      if (selectedIndex < 0) document.getElementById('kpiSelected').textContent = '-';
+    }
+
+    function setStatus(message, isError = false) {
+      const el = document.getElementById('actionStatus');
+      el.textContent = message;
+      el.style.color = isError ? 'var(--danger)' : 'var(--muted)';
     }
 
     function escapeHtml(value) {
-      return String(value)
+      return String(value || '')
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
@@ -500,88 +719,7 @@
         .replaceAll("'", '&#039;');
     }
 
-    async function loadCSV() {
-      tableStatus.textContent = 'Carregando CSV...';
-      try {
-        const response = await fetch(CSV_URL + '&cacheBust=' + Date.now());
-        if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
-        const text = await response.text();
-        allRows = csvToObjects(text);
-        selectedIndex = null;
-        renderTable(allRows);
-        formStatus.textContent = 'Nenhuma linha selecionada';
-        showMessage('CSV carregado com sucesso.', 'success');
-      } catch (error) {
-        console.error(error);
-        tableStatus.textContent = 'Falha ao carregar CSV';
-        showMessage('Não foi possível carregar o CSV. Verifique se o link publicado está ativo e público.', 'error');
-      }
-    }
-
-    function applyFilter() {
-      const term = searchInput.value.trim().toLowerCase();
-      if (!term) {
-        renderTable(allRows);
-        return;
-      }
-
-      const rows = allRows.filter(row => {
-        return fields.some(field => String(row[field] || '').toLowerCase().includes(term));
-      });
-      renderTable(rows);
-    }
-
-    function cadastrarNovo() {
-      const data = getFormData();
-      if (!data.ID_DOCUMENTO) {
-        showMessage('Informe pelo menos o ID_DOCUMENTO antes de cadastrar.', 'warning');
-        return;
-      }
-
-      data.__index = allRows.length;
-      allRows.push(data);
-      applyFilter();
-      showMessage('Cadastro simulado na tabela local. Na próxima etapa, este botão enviará os dados para o backend/Vercel.', 'success');
-    }
-
-    function alterarSelecionado() {
-      if (selectedIndex === null) {
-        showMessage('Selecione uma linha da tabela antes de alterar.', 'warning');
-        return;
-      }
-
-      const data = getFormData();
-      data.__index = selectedIndex;
-      allRows[selectedIndex] = data;
-      applyFilter();
-      formStatus.textContent = `Registro alterado localmente: ${data.ID_DOCUMENTO || 'sem ID'}`;
-      showMessage('Alteração simulada na tabela local. Na próxima etapa, este botão atualizará a planilha pelo backend/Vercel.', 'success');
-    }
-
-    async function copiarJson() {
-      const data = getFormData();
-      const text = JSON.stringify(data, null, 2);
-      try {
-        await navigator.clipboard.writeText(text);
-        showMessage('JSON do formulário copiado para a área de transferência.', 'success');
-      } catch (error) {
-        console.log(text);
-        showMessage('Não consegui copiar automaticamente. O JSON foi exibido no console do navegador.', 'warning');
-      }
-    }
-
-    document.getElementById('btnCarregar').addEventListener('click', loadCSV);
-    document.getElementById('btnNovo').addEventListener('click', clearForm);
-    document.getElementById('btnCadastrar').addEventListener('click', cadastrarNovo);
-    document.getElementById('btnAlterar').addEventListener('click', alterarSelecionado);
-    document.getElementById('btnCopiarJson').addEventListener('click', copiarJson);
-    document.getElementById('btnLimparFiltro').addEventListener('click', () => {
-      searchInput.value = '';
-      renderTable(allRows);
-    });
-    searchInput.addEventListener('input', applyFilter);
-
-    loadCSV();
+    document.addEventListener('DOMContentLoaded', loadCsv);
   </script>
 </body>
 </html>
