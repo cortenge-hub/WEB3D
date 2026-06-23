@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teste CRUD - Documentos Google Sheets CSV</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --primary: #1f4e79;
+      --primary-dark: #163a59;
+      --accent: #f2b705;
+      --border: #d8dee6;
+      --text: #1f2933;
+      --muted: #6b7280;
+      --danger: #b42318;
+      --success: #0f766e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      padding: 22px 28px;
+      border-bottom: 5px solid var(--accent);
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 0 18px 32px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .card-title {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-title h2 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--primary);
+    }
+
+    .status {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .form-grid {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field.full { grid-column: span 4; }
+    .field.double { grid-column: span 2; }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #344054;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 74px;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: 2px solid rgba(31, 78, 121, 0.18);
+      border-color: var(--primary);
+    }
+
+    .actions {
+      padding: 0 20px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.05s ease, opacity 0.2s ease;
+    }
+
+    button:active { transform: translateY(1px); }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-secondary { background: #e5e7eb; color: #111827; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-warning { background: var(--accent); color: #1f2933; }
+    .btn-outline { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
+
+    .toolbar {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .search {
+      min-width: 280px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      max-height: 520px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1040px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #eef3f8;
+      color: #243b53;
+      z-index: 1;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    tbody tr {
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    tbody tr.selected {
+      background: #fff7d6;
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .message {
+      margin: 0 20px 18px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .message.show { display: block; }
+    .message.info { background: #e0f2fe; color: #075985; }
+    .message.success { background: #ccfbf1; color: #115e59; }
+    .message.warning { background: #fef3c7; color: #92400e; }
+    .message.error { background: #fee2e2; color: var(--danger); }
+
+    .small-note {
+      padding: 0 20px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 920px) {
+      .form-grid { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+      .field.full, .field.double { grid-column: span 2; }
+    }
+
+    @media (max-width: 560px) {
+      header { padding: 18px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full, .field.double { grid-column: span 1; }
+      .search { min-width: 100%; }
+      .toolbar { align-items: stretch; }
+      .toolbar-left, .toolbar-right { width: 100%; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Teste de Cadastro / Alteração - 06_DOCUMENTOS</h1>
+    <p>Protótipo HTML para GitHub Pages com leitura de CSV publicado no Google Sheets.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="card-title">
+        <h2>Formulário do documento</h2>
+        <span class="status" id="formStatus">Nenhuma linha selecionada</span>
+      </div>
+
+      <form id="docForm">
+        <div class="form-grid">
+          <div class="field">
+            <label for="ID_DOCUMENTO">ID Documento</label>
+            <input id="ID_DOCUMENTO" name="ID_DOCUMENTO" placeholder="Ex.: DOC-001" />
+          </div>
+
+          <div class="field">
+            <label for="ID_QUADRO">ID Quadro</label>
+            <input id="ID_QUADRO" name="ID_QUADRO" placeholder="Ex.: QD-12E2-001" />
+          </div>
+
+          <div class="field">
+            <label for="TIPO_DOCUMENTO">Tipo Documento</label>
+            <select id="TIPO_DOCUMENTO" name="TIPO_DOCUMENTO">
+              <option value="">Selecione...</option>
+              <option>Diagrama</option>
+              <option>DataBook</option>
+              <option>Manual</option>
+              <option>Memorial</option>
+              <option>Relatório</option>
+              <option>Laudo</option>
+              <option>Foto</option>
+              <option>Outro</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="REVISAO">Revisão</label>
+            <input id="REVISAO" name="REVISAO" placeholder="Ex.: R00" />
+          </div>
+
+          <div class="field double">
+            <label for="DESCRICAO">Descrição</label>
+            <input id="DESCRICAO" name="DESCRICAO" placeholder="Descrição do documento" />
+          </div>
+
+          <div class="field">
+            <label for="DATA">Data</label>
+            <input id="DATA" name="DATA" type="date" />
+          </div>
+
+          <div class="field">
+            <label for="LINK">Link</label>
+            <input id="LINK" name="LINK" placeholder="URL ou caminho do arquivo" />
+          </div>
+
+          <div class="field full">
+            <label for="OBS">Observações</label>
+            <textarea id="OBS" name="OBS" placeholder="Observações complementares"></textarea>
+          </div>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="actions">
+          <button type="button" class="btn-secondary" id="btnNovo">Novo / Limpar</button>
+          <button type="button" class="btn-success" id="btnCadastrar">Cadastrar novo</button>
+          <button type="button" class="btn-warning" id="btnAlterar">Alterar selecionado</button>
+          <button type="button" class="btn-outline" id="btnCopiarJson">Copiar JSON do formulário</button>
+        </div>
+      </form>
+
+      <div class="small-note">
+        Nesta versão inicial, os botões simulam a inclusão/alteração apenas na tela. A gravação definitiva na planilha será feita depois via backend/Vercel ou outro endpoint seguro.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">
+        <h2>Tabela carregada do CSV</h2>
+        <span class="status" id="tableStatus">Aguardando carregamento...</span>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button type="button" class="btn-primary" id="btnCarregar">Carregar / Recarregar CSV</button>
+          <button type="button" class="btn-secondary" id="btnLimparFiltro">Limpar filtro</button>
+        </div>
+        <div class="toolbar-right">
+          <input class="search" id="searchInput" placeholder="Filtrar na tabela..." />
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="dataTable">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=858500309&single=true&output=csv';
+
+    const fields = ['ID_DOCUMENTO', 'ID_QUADRO', 'TIPO_DOCUMENTO', 'DESCRICAO', 'LINK', 'REVISAO', 'DATA', 'OBS'];
+    let allRows = [];
+    let filteredRows = [];
+    let selectedIndex = null;
+
+    const form = document.getElementById('docForm');
+    const formStatus = document.getElementById('formStatus');
+    const tableStatus = document.getElementById('tableStatus');
+    const message = document.getElementById('message');
+    const thead = document.querySelector('#dataTable thead');
+    const tbody = document.querySelector('#dataTable tbody');
+    const searchInput = document.getElementById('searchInput');
+
+    function showMessage(text, type = 'info') {
+      message.textContent = text;
+      message.className = `message show ${type}`;
+      window.clearTimeout(showMessage.timer);
+      showMessage.timer = window.setTimeout(() => {
+        message.className = 'message';
+      }, 4500);
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let current = '';
+      let row = [];
+      let insideQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"' && insideQuotes && next === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+          row.push(current);
+          current = '';
+        } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+          if (char === '\r' && next === '\n') i++;
+          row.push(current);
+          if (row.some(cell => cell.trim() !== '')) rows.push(row);
+          row = [];
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      if (current || row.length) {
+        row.push(current);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function csvToObjects(csvText) {
+      const rows = parseCSV(csvText.trim());
+      const headers = rows.shift().map(h => h.trim());
+      return rows.map((row, index) => {
+        const obj = { __index: index };
+        headers.forEach((header, i) => {
+          obj[header] = row[i] ? row[i].trim() : '';
+        });
+        return obj;
+      });
+    }
+
+    function formatDateForInput(value) {
+      if (!value) return '';
+      const clean = value.trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) return clean;
+      const match = clean.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (match) return `${match[3]}-${match[2]}-${match[1]}`;
+      return clean;
+    }
+
+    function getFormData() {
+      const data = {};
+      fields.forEach(field => {
+        data[field] = document.getElementById(field).value.trim();
+      });
+      return data;
+    }
+
+    function setFormData(row) {
+      fields.forEach(field => {
+        const el = document.getElementById(field);
+        el.value = field === 'DATA' ? formatDateForInput(row[field] || '') : (row[field] || '');
+      });
+    }
+
+    function clearForm() {
+      form.reset();
+      selectedIndex = null;
+      document.querySelectorAll('tbody tr').forEach(tr => tr.classList.remove('selected'));
+      formStatus.textContent = 'Novo cadastro em branco';
+      showMessage('Formulário limpo. Preencha os dados para cadastrar um novo documento.', 'info');
+    }
+
+    function renderTable(rows) {
+      filteredRows = rows;
+      thead.innerHTML = `<tr>${fields.map(h => `<th>${h}</th>`).join('')}</tr>`;
+      tbody.innerHTML = '';
+
+      rows.forEach((row, visibleIndex) => {
+        const tr = document.createElement('tr');
+        tr.dataset.visibleIndex = visibleIndex;
+        tr.dataset.originalIndex = row.__index;
+        tr.innerHTML = fields.map(field => `<td>${escapeHtml(row[field] || '')}</td>`).join('');
+        tr.addEventListener('click', () => selectRow(visibleIndex, tr));
+        tbody.appendChild(tr);
+      });
+
+      tableStatus.textContent = `${rows.length} registro(s) exibido(s) de ${allRows.length} carregado(s)`;
+    }
+
+    function selectRow(visibleIndex, tr) {
+      const row = filteredRows[visibleIndex];
+      selectedIndex = row.__index;
+      document.querySelectorAll('tbody tr').forEach(item => item.classList.remove('selected'));
+      tr.classList.add('selected');
+      setFormData(row);
+      formStatus.textContent = `Linha selecionada: ${row.ID_DOCUMENTO || 'sem ID'}`;
+      showMessage('Linha carregada no formulário. Agora você pode alterar os dados.', 'success');
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    async function loadCSV() {
+      tableStatus.textContent = 'Carregando CSV...';
+      try {
+        const response = await fetch(CSV_URL + '&cacheBust=' + Date.now());
+        if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+        const text = await response.text();
+        allRows = csvToObjects(text);
+        selectedIndex = null;
+        renderTable(allRows);
+        formStatus.textContent = 'Nenhuma linha selecionada';
+        showMessage('CSV carregado com sucesso.', 'success');
+      } catch (error) {
+        console.error(error);
+        tableStatus.textContent = 'Falha ao carregar CSV';
+        showMessage('Não foi possível carregar o CSV. Verifique se o link publicado está ativo e público.', 'error');
+      }
+    }
+
+    function applyFilter() {
+      const term = searchInput.value.trim().toLowerCase();
+      if (!term) {
+        renderTable(allRows);
+        return;
+      }
+
+      const rows = allRows.filter(row => {
+        return fields.some(field => String(row[field] || '').toLowerCase().includes(term));
+      });
+      renderTable(rows);
+    }
+
+    function cadastrarNovo() {
+      const data = getFormData();
+      if (!data.ID_DOCUMENTO) {
+        showMessage('Informe pelo menos o ID_DOCUMENTO antes de cadastrar.', 'warning');
+        return;
+      }
+
+      data.__index = allRows.length;
+      allRows.push(data);
+      applyFilter();
+      showMessage('Cadastro simulado na tabela local. Na próxima etapa, este botão enviará os dados para o backend/Vercel.', 'success');
+    }
+
+    function alterarSelecionado() {
+      if (selectedIndex === null) {
+        showMessage('Selecione uma linha da tabela antes de alterar.', 'warning');
+        return;
+      }
+
+      const data = getFormData();
+      data.__index = selectedIndex;
+      allRows[selectedIndex] = data;
+      applyFilter();
+      formStatus.textContent = `Registro alterado localmente: ${data.ID_DOCUMENTO || 'sem ID'}`;
+      showMessage('Alteração simulada na tabela local. Na próxima etapa, este botão atualizará a planilha pelo backend/Vercel.', 'success');
+    }
+
+    async function copiarJson() {
+      const data = getFormData();
+      const text = JSON.stringify(data, null, 2);
+      try {
+        await navigator.clipboard.writeText(text);
+        showMessage('JSON do formulário copiado para a área de transferência.', 'success');
+      } catch (error) {
+        console.log(text);
+        showMessage('Não consegui copiar automaticamente. O JSON foi exibido no console do navegador.', 'warning');
+      }
+    }
+
+    document.getElementById('btnCarregar').addEventListener('click', loadCSV);
+    document.getElementById('btnNovo').addEventListener('click', clearForm);
+    document.getElementById('btnCadastrar').addEventListener('click', cadastrarNovo);
+    document.getElementById('btnAlterar').addEventListener('click', alterarSelecionado);
+    document.getElementById('btnCopiarJson').addEventListener('click', copiarJson);
+    document.getElementById('btnLimparFiltro').addEventListener('click', () => {
+      searchInput.value = '';
+      renderTable(allRows);
+    });
+    searchInput.addEventListener('input', applyFilter);
+
+    loadCSV();
+  </script>
+</body>
+</html>
