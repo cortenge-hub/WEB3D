@@ -1,1 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste SQLite - Instal Electric</title>
+</head>
+<body>
 
+  <h1>Teste SQLite - Cadastro de Edifícios</h1>
+
+  <label>Código:</label><br>
+  <input id="codigo" placeholder="TJRS"><br><br>
+
+  <label>Nome:</label><br>
+  <input id="nome" placeholder="Tribunal de Justiça RS"><br><br>
+
+  <label>Endereço:</label><br>
+  <input id="endereco" placeholder="Porto Alegre/RS"><br><br>
+
+  <label>Observações:</label><br>
+  <textarea id="observacoes"></textarea><br><br>
+
+  <button onclick="salvarEdificio()">Salvar</button>
+
+  <hr>
+
+  <h2>Edifícios cadastrados</h2>
+  <button onclick="listarEdificios()">Atualizar lista</button>
+
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Código</th>
+        <th>Nome</th>
+        <th>Endereço</th>
+        <th>Observações</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaEdificios"></tbody>
+  </table>
+
+  <script>
+    const API_URL = "https://shiny-zebra-5vg6grjx9gwrcp4v6-5000.app.github.dev";
+
+    async function salvarEdificio() {
+      const dados = {
+        codigo: document.getElementById("codigo").value,
+        nome: document.getElementById("nome").value,
+        endereco: document.getElementById("endereco").value,
+        observacoes: document.getElementById("observacoes").value
+      };
+
+      const resposta = await fetch(`${API_URL}/edificios`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+      });
+
+      const resultado = await resposta.json();
+      alert(resultado.mensagem);
+
+      listarEdificios();
+    }
+
+    async function listarEdificios() {
+      const resposta = await fetch(`${API_URL}/edificios`);
+      const dados = await resposta.json();
+
+      const tabela = document.getElementById("tabelaEdificios");
+      tabela.innerHTML = "";
+
+      dados.forEach(item => {
+        tabela.innerHTML += `
+          <tr>
+            <td>${item.id}</td>
+            <td>${item.codigo}</td>
+            <td>${item.nome}</td>
+            <td>${item.endereco || ""}</td>
+            <td>${item.observacoes || ""}</td>
+          </tr>
+        `;
+      });
+    }
+
+    listarEdificios();
+  </script>
+</body>
+</html>
