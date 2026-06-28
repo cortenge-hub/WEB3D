@@ -2,90 +2,118 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Teste SQLite - Instal Electric</title>
+  <title>Instal Electric Studio</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <h1>Teste SQLite - Cadastro de Edifícios</h1>
+<div class="app">
 
-  <label>Código:</label><br>
-  <input id="codigo" placeholder="TJRS"><br><br>
+  <header class="topbar">
+    <div class="title">Instal Electric Studio</div>
+    <div class="user">SQLite Test Environment</div>
+  </header>
 
-  <label>Nome:</label><br>
-  <input id="nome" placeholder="Tribunal de Justiça RS"><br><br>
+  <nav class="ribbon">
+    <button>Novo</button>
+    <button>Salvar</button>
+    <button>Atualizar</button>
+    <button>Importar</button>
+    <button>Exportar</button>
+    <button>Google Sheets</button>
+  </nav>
 
-  <label>Endereço:</label><br>
-  <input id="endereco" placeholder="Porto Alegre/RS"><br><br>
+  <main class="workspace">
 
-  <label>Observações:</label><br>
-  <textarea id="observacoes"></textarea><br><br>
+    <aside class="sidebar">
+      <h3>DATABASE</h3>
 
-  <button onclick="salvarEdificio()">Salvar</button>
+      <button onclick="abrirTabela('edificios')">🏢 Edifícios</button>
+      <button onclick="abrirTabela('pavimentos')">🏬 Pavimentos</button>
+      <button onclick="abrirTabela('setores')">📍 Setores</button>
+      <button onclick="abrirTabela('ambientes')">🚪 Ambientes</button>
+      <button onclick="abrirTabela('quadros')">⚡ Quadros</button>
+      <button onclick="abrirTabela('circuitos')">🔌 Circuitos</button>
+      <button onclick="abrirTabela('equipamentos')">⚙ Equipamentos</button>
 
-  <hr>
+      <h3>DOCUMENTAÇÃO</h3>
+      <button onclick="abrirTabela('documentos')">📄 Documentos</button>
+      <button onclick="abrirTabela('fotos360')">🌐 Fotos 360</button>
 
-  <h2>Edifícios cadastrados</h2>
-  <button onclick="listarEdificios()">Atualizar lista</button>
+      <h3>BIM / MODELOS</h3>
+      <button onclick="abrirTabela('modelos3d')">📦 Modelos 3D</button>
+      <button onclick="abrirTabela('arquivos_ifc')">🏗 IFC</button>
+      <button onclick="abrirTabela('arquivos_dxf')">📐 DXF</button>
+      <button onclick="abrirTabela('plantas')">🗺 Plantas</button>
+      <button onclick="abrirTabela('marcadores')">📍 Marcadores</button>
 
-  <table border="1" cellpadding="6">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Código</th>
-        <th>Nome</th>
-        <th>Endereço</th>
-        <th>Observações</th>
-      </tr>
-    </thead>
-    <tbody id="tabelaEdificios"></tbody>
-  </table>
+      <h3>GESTÃO</h3>
+      <button onclick="abrirTabela('manutencoes')">🔧 Manutenções</button>
+      <button onclick="abrirTabela('inspecoes')">✔ Inspeções</button>
+      <button onclick="abrirTabela('eventos')">📅 Eventos</button>
+      <button onclick="abrirTabela('usuarios')">👤 Usuários</button>
+      <button onclick="abrirTabela('configuracoes')">⚙ Configurações</button>
+      <button onclick="abrirTabela('sincronizacao')">🔄 Sincronização</button>
+    </aside>
 
-  <script>
-    const API_URL = "https://shiny-zebra-5vg6grjx9gwrcp4v6-5000.app.github.dev";
+    <section class="main-panel">
+      <div class="tabs">
+        <div class="tab active" id="abaAtual">Início</div>
+      </div>
 
-    async function salvarEdificio() {
-      const dados = {
-        codigo: document.getElementById("codigo").value,
-        nome: document.getElementById("nome").value,
-        endereco: document.getElementById("endereco").value,
-        observacoes: document.getElementById("observacoes").value
-      };
+      <div class="content">
+        <h1 id="tituloModulo">Administrador do Banco de Dados</h1>
 
-      const resposta = await fetch(`${API_URL}/edificios`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados)
-      });
+        <div class="form-box">
+          <h2>Área de Cadastro</h2>
+          <p id="descricaoModulo">Selecione uma tabela no menu lateral.</p>
+        </div>
 
-      const resultado = await resposta.json();
-      alert(resultado.mensagem);
+        <div class="table-box">
+          <h2>Lista de Registros</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="4">Nenhuma tabela selecionada.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-      listarEdificios();
-    }
+    <aside class="properties">
+      <h3>PROPRIEDADES</h3>
+      <div class="prop">
+        <label>Tabela</label>
+        <span id="propTabela">-</span>
+      </div>
+      <div class="prop">
+        <label>Status</label>
+        <span>Ambiente de teste</span>
+      </div>
+      <div class="prop">
+        <label>Banco</label>
+        <span>Instal_Electric.db</span>
+      </div>
+    </aside>
 
-    async function listarEdificios() {
-      const resposta = await fetch(`${API_URL}/edificios`);
-      const dados = await resposta.json();
+  </main>
 
-      const tabela = document.getElementById("tabelaEdificios");
-      tabela.innerHTML = "";
+  <footer class="statusbar">
+    SQLite conectado | Google Sheets desconectado | Instal Electric Studio v0.1
+  </footer>
 
-      dados.forEach(item => {
-        tabela.innerHTML += `
-          <tr>
-            <td>${item.id}</td>
-            <td>${item.codigo}</td>
-            <td>${item.nome}</td>
-            <td>${item.endereco || ""}</td>
-            <td>${item.observacoes || ""}</td>
-          </tr>
-        `;
-      });
-    }
+</div>
 
-    listarEdificios();
-  </script>
+<script src="js/app.js"></script>
 </body>
 </html>
