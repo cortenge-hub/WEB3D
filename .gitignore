@@ -5,3 +5,5 @@
 __pycache__/
 *.pyc
 >>>>>>> 2bd0102 (Remove cache Python do versionamento)
+__pycache__/
+*.pyc
