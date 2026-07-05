@@ -1,2 +1,7 @@
 *.db
+<<<<<<< HEAD
 *.db
+=======
+__pycache__/
+*.pyc
+>>>>>>> 2bd0102 (Remove cache Python do versionamento)
