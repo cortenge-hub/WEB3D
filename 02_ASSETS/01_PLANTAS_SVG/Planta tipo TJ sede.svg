@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9200 3800" width="9200cm" height="3800cm">
+    <defs>
+        <pattern id="hatch" patternUnits="userSpaceOnUse" width="40" height="40" patternTransform="rotate(-45)">
+            <line x1="0" y1="0" x2="0" y2="40" stroke="#222" stroke-width="6"/>
+        </pattern>
+    </defs>
+
+    <style>
+        .rect { fill: url(#hatch); stroke: #222; stroke-width: 10px; }
+        .wire { fill: none; stroke: #222; stroke-width: 10px; stroke-linecap: round; stroke-linejoin: round; }
+        .label { font-family: Arial, sans-serif; font-size: 110px; fill: #111; text-anchor: middle; }
+    </style>
+
+    <text class="label" x="1000" y="350">TORRE W1</text>
+    <text class="label" x="3700" y="350">TORRE W2</text>
+    <text class="label" x="5100" y="350">TORRE W3</text>
+    <text class="label" x="8200" y="350">TORRE W4</text>
+
+    <text class="label" x="1000" y="3600">TORRE E1</text>
+    <text class="label" x="3700" y="3600">TORRE E2</text>
+    <text class="label" x="5100" y="3600">TORRE E3</text>
+    <text class="label" x="8200" y="3600">TORRE E4</text>
+
+    <rect class="rect" x="800" y="800" width="400" height="700"/>
+    <rect class="rect" x="3500" y="800" width="400" height="700"/>
+    <rect class="rect" x="4700" y="800" width="800" height="700"/>
+    <rect class="rect" x="8000" y="800" width="400" height="700"/>
+
+    <rect class="rect" x="800" y="2300" width="400" height="700"/>
+    <rect class="rect" x="3500" y="2300" width="400" height="700"/>
+    <rect class="rect" x="4700" y="2300" width="800" height="700"/>
+    <rect class="rect" x="8000" y="2300" width="400" height="700"/>
+
+    <path class="wire" d="M 1000 800 L 1000 550 L 3700 550 L 3700 800"/>
+    <path class="wire" d="M 3900 800 L 4700 800"/>
+    <path class="wire" d="M 5100 800 L 5100 550 L 8200 550 L 8200 800"/>
+
+    <path class="wire" d="M 1000 3000 L 1000 3250 L 3700 3250 L 3700 3000"/>
+    <path class="wire" d="M 3900 3000 L 4700 3000"/>
+    <path class="wire" d="M 5100 3000 L 5100 3250 L 8200 3250 L 8200 3000"/>
+
+    <path class="wire" d="M 800 1150 L 400 1150 L 400 2650 L 800 2650"/>
+    <path class="wire" d="M 8400 1150 L 8800 1150 L 8800 2650 L 8400 2650"/>
+</svg>
