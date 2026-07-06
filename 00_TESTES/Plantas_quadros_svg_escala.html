@@ -1,1 +1,191 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Visualizador de Plantas e Quadros Elétricos - SVG</title>
+  <style>
+    :root{
+      --bg:#f6f8fb; --panel:#ffffff; --line:#d7dee8; --text:#1d2430; --muted:#667085;
+      --brand:#2f6f5e; --brand2:#e8f3ef; --danger:#b42318; --warn:#b54708;
+      --shadow:0 10px 24px rgba(16,24,40,.08); --radius:14px;
+      --font: Arial, Helvetica, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:var(--font);color:var(--text);font-size:13px;overflow:hidden}
+    header{height:56px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 16px;box-shadow:0 2px 10px rgba(16,24,40,.04);position:relative;z-index:3}
+    header h1{font-size:16px;margin:0;font-weight:700;color:#23433b;white-space:nowrap}
+    header .status{margin-left:auto;color:var(--muted);font-size:12px}
+    main{height:calc(100vh - 56px);display:grid;grid-template-columns:340px 1fr 360px;gap:12px;padding:12px}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);min-height:0;overflow:hidden;display:flex;flex-direction:column}
+    .panel h2{font-size:13px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);background:#fbfcfe;color:#344054;text-transform:uppercase;letter-spacing:.02em}
+    .panel-body{padding:12px;overflow:auto;min-height:0}
+    label{display:block;font-size:12px;color:#344054;font-weight:600;margin:8px 0 5px}
+    input, select, textarea, button{font-family:var(--font);font-size:13px}
+    input, select, textarea{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--text);padding:8px 9px;outline:none}
+    input:focus, select:focus, textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(47,111,94,.12)}
+    textarea{min-height:80px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.btn{border:1px solid var(--line);border-radius:9px;background:#fff;color:#263238;padding:8px 10px;cursor:pointer;font-weight:600}.btn:hover{background:#f2f6f9}.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn.warn{color:var(--warn)}.btn.danger{color:var(--danger)}
+    .viewer-wrap{position:relative;flex:1;min-height:0;background:#eef2f7}
+    #viewer{width:100%;height:100%;display:block;background:#fff;cursor:grab}.dragging #viewer{cursor:grabbing}.crosshair{cursor:crosshair!important}
+    .toolbar{position:absolute;left:12px;top:12px;z-index:2;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);display:flex;gap:6px;padding:7px;align-items:center}
+    .toolbar button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;cursor:pointer;font-weight:700}.toolbar .sep{width:1px;height:22px;background:var(--line);margin:0 2px}
+    .legend{position:absolute;right:12px;bottom:12px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:10px 12px;color:#344054;font-size:12px;line-height:1.5}
+    .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px}.sw.planta{background:#f9fafb;border:1px solid #98a2b3}.sw.amb{background:#e8f3ff;border:1px solid #2e90fa}.sw.q{background:#d1fadf;border:1px solid #039855}
+    table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:7px 6px;border-bottom:1px solid #eef2f6;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#f9fafb;color:#475467;z-index:1}tr:hover{background:#f6fbf9}tr.selected{background:var(--brand2)}
+    .muted{color:var(--muted);font-size:12px}.small{font-size:11px;color:var(--muted)}.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 7px;background:#fff;font-size:11px;color:#344054;margin:2px 3px 2px 0}
+    .divider{height:1px;background:var(--line);margin:12px 0}.checkline{display:flex;align-items:center;gap:8px;margin:7px 0}.checkline input{width:auto}.footer-note{padding:9px 12px;border-top:1px solid var(--line);background:#fbfcfe;color:var(--muted);font-size:11px}
+    .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#101828;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:var(--shadow);display:none;z-index:10;max-width:80vw}.toast.show{display:block}
+    .code{font-family:Consolas, monospace;background:#f2f4f7;border:1px solid #eaecf0;border-radius:8px;padding:8px;white-space:pre-wrap;overflow:auto;max-height:170px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Visualizador SVG — Plantas, Ambientes e Quadros Elétricos</h1>
+  <span class="pill">layout claro</span><span class="pill">coordenadas X/Y</span><span class="pill">escala por largura/profundidade</span>
+  <div class="status" id="status">Aguardando carregamento...</div>
+</header>
+<main>
+  <section class="panel">
+    <h2>Base de dados e camadas</h2>
+    <div class="panel-body">
+      <label>CSV 04_PLANTAS</label>
+      <input id="urlPlantas" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=1441671362&single=true&output=csv">
+      <label>CSV 08_OBJETOS3D</label>
+      <input id="urlObjetos" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=1290160730&single=true&output=csv">
+      <label>CSV 01_QUADROS</label>
+      <input id="urlQuadros" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQf6iiyxDFpR2QYdkGOxAdKNnDy_Ijkp5RTa5SJCrrXCw45YkzD0X91hLAq_XKQ4yM0lR8pI4U3ns1x/pub?gid=548425096&single=true&output=csv">
+      <div class="btns"><button class="btn primary" id="btnLoad">Carregar CSVs</button><button class="btn" id="btnSample">Usar exemplo local</button></div>
+      <div class="divider"></div>
+      <label>Escolher a planta</label><select id="plantaSelect"></select>
+      <div class="btns"><button class="btn" id="btnFit">Ajustar tela</button><button class="btn" id="btnGrid">Grade</button><button class="btn" id="btnAdd">Adicionar quadro manual</button></div>
+      <div class="divider"></div>
+      <label>Ajuste da escala da planta baixa</label>
+      <div class="row3"><div><label>Escala X</label><input id="plantScaleX" type="number" value="1" step="0.01"></div><div><label>Escala Y</label><input id="plantScaleY" type="number" value="1" step="0.01"></div><div><label>Rotação</label><input id="plantRot" type="number" value="0" step="1"></div></div>
+      <div class="row"><div><label>Deslocamento X</label><input id="plantOffsetX" type="number" value="0" step="1"></div><div><label>Deslocamento Y</label><input id="plantOffsetY" type="number" value="0" step="1"></div></div>
+      <div class="btns"><button class="btn primary" id="btnApplyPlantScale">Aplicar escala da planta</button><button class="btn" id="btnResetPlantScale">Resetar planta</button><button class="btn" id="btnCopyPlantScale">Copiar ajuste</button></div>
+      <p class="small">Este ajuste altera somente a visualização da planta/ambiente. Os quadros permanecem nas coordenadas X/Y da planilha para facilitar a conferência.</p>
+      <div class="divider"></div>
+      <label>Visibilidade</label>
+      <div class="checkline"><input type="checkbox" id="chkPlanta" checked><span>SVG da planta</span></div>
+      <div class="checkline"><input type="checkbox" id="chkAmb" checked><span>SVG do ambiente</span></div>
+      <div class="checkline"><input type="checkbox" id="chkQuadros" checked><span>Símbolos dos quadros</span></div>
+      <div class="checkline"><input type="checkbox" id="chkLabels" checked><span>Identificação dos quadros</span></div>
+      <div class="divider"></div>
+      <label>Escala dos quadros</label>
+      <div class="row"><div><label>mm por unidade SVG</label><input id="mmPorUnidade" type="number" value="10" step="1"></div><div><label>Altura visual padrão</label><input id="alturaVisual" type="number" value="36" step="1"></div></div>
+      <p class="small">Largura = Q_LARG ÷ mm/unidade. Profundidade = Q_PROF ÷ mm/unidade. Use para conferir se o símbolo está proporcional na planta.</p>
+    </div>
+    <div class="footer-note">Dica: arraste um quadro no desenho e copie os valores X/Y para lançar manualmente na planilha.</div>
+  </section>
 
+  <section class="panel">
+    <h2>Visualização da planta</h2>
+    <div class="viewer-wrap" id="wrap">
+      <div class="toolbar">
+        <button id="zoomIn">+</button><button id="zoomOut">−</button><button id="resetView">100%</button><span class="sep"></span><button id="modePan">Pan</button><button id="modeSelect">Selecionar</button>
+      </div>
+      <svg id="viewer" xmlns="http://www.w3.org/2000/svg">
+        <defs><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="#e4e7ec" stroke-width="1"/></pattern></defs>
+        <rect id="gridRect" x="-5000" y="-5000" width="10000" height="10000" fill="url(#grid)" display="none"/>
+        <g id="camera"><g id="layerPlanta"></g><g id="layerAmb"></g><g id="layerQuadros"></g></g>
+      </svg>
+      <div class="legend"><div><span class="sw planta"></span>Planta</div><div><span class="sw amb"></span>Ambiente</div><div><span class="sw q"></span>Quadro em escala</div><div class="small">Mouse: roda = zoom | arrastar fundo = pan</div></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Quadros e coordenadas</h2>
+    <div class="panel-body">
+      <label>Pesquisar quadro</label><input id="search" placeholder="Ex.: QDE2, QDG, 06P...">
+      <div class="row3"><div><label>X_3D</label><input id="editX" type="number" step="1"></div><div><label>Y_3D</label><input id="editY" type="number" step="1"></div><div><label>ROT_X</label><input id="editRot" type="number" step="1"></div></div>
+      <div class="row"><div><label>Q_LARG</label><input id="editLarg" type="number" step="1"></div><div><label>Q_PROF</label><input id="editProf" type="number" step="1"></div></div>
+      <div class="btns"><button class="btn primary" id="btnApply">Aplicar no desenho</button><button class="btn" id="btnCopy">Copiar linha CSV</button><button class="btn" id="btnExport">Exportar JSON</button></div>
+      <div class="divider"></div>
+      <table><thead><tr><th>Quadro</th><th>X</th><th>Y</th><th>Larg</th><th>Prof</th></tr></thead><tbody id="tbody"></tbody></table>
+      <div class="divider"></div>
+      <label>Saída / cópia</label><div id="output" class="code">Selecione ou movimente um quadro.</div>
+    </div>
+  </section>
+</main>
+<div id="toast" class="toast"></div>
+<script>
+const DEFAULT_PLANTA_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 590"><g><text x="100" y="55" font-family="Arial" font-size="16">TORRE W1</text><text x="370" y="55" font-family="Arial" font-size="16">TORRE W2</text><text x="510" y="55" font-family="Arial" font-size="16">TORRE W3</text><text x="820" y="55" font-family="Arial" font-size="16">TORRE W4</text><text x="100" y="555" font-family="Arial" font-size="16">TORRE E1</text><text x="370" y="555" font-family="Arial" font-size="16">TORRE E2</text><text x="510" y="555" font-family="Arial" font-size="16">TORRE E3</text><text x="820" y="555" font-family="Arial" font-size="16">TORRE E4</text><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="80" y="120"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="350" y="120"/><rect fill="none" width="80" height="100" stroke="#222" stroke-width="1.5" x="470" y="120"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="800" y="120"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="80" y="370"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="350" y="370"/><rect fill="none" width="80" height="100" stroke="#222" stroke-width="1.5" x="470" y="370"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="800" y="370"/><path d="M100,120L100,85L370,85L370,120" fill="none" stroke="#222" stroke-width="1.5"/><path d="M390,120L470,120" fill="none" stroke="#222" stroke-width="1.5"/><path d="M510,120L510,85L820,85L820,120" fill="none" stroke="#222" stroke-width="1.5"/><path d="M100,470L100,505L370,505L370,470" fill="none" stroke="#222" stroke-width="1.5"/><path d="M390,470L470,470" fill="none" stroke="#222" stroke-width="1.5"/><path d="M510,470L510,505L820,505L820,470" fill="none" stroke="#222" stroke-width="1.5"/><path d="M80,170L40,170L40,420L80,420" fill="none" stroke="#222" stroke-width="1.5"/><path d="M840,170L880,170L880,420L840,420" fill="none" stroke="#222" stroke-width="1.5"/></g></svg>`;
+let plantas=[], objetos=[], quadros=[], selected=null, mode='select', showGrid=false;
+let view={x:0,y:0,k:1}; const NS='http://www.w3.org/2000/svg';
+const $=id=>document.getElementById(id);
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function parseCSV(text){const rows=[];let row=[],cur='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&q&&n==='"'){cur+='"';i++}else if(c==='"'){q=!q}else if(c===','&&!q){row.push(cur);cur=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cur);if(row.some(v=>v.trim()!==''))rows.push(row);row=[];cur=''}else cur+=c}row.push(cur);if(row.some(v=>v.trim()!==''))rows.push(row);if(!rows.length)return[];const head=rows.shift().map(h=>h.trim());return rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]||'').trim()])))}
+async function fetchCSV(url){const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error(r.status+' '+url); return parseCSV(await r.text())}
+function first(obj,names,def=''){for(const n of names){const k=Object.keys(obj).find(k=>k.toUpperCase().trim()===n.toUpperCase());if(k && obj[k]!==undefined && obj[k]!== '') return obj[k]}return def}
+function num(v,d=0){const n=parseFloat(String(v??'').replace(',','.')); return isNaN(n)?d:n}
+function normalizeQuadro(r,i){return {...r, _id:first(r,['ID','CODIGO','CÓDIGO','QUADRO','NOME'],'Q'+(i+1)), _nome:first(r,['QUADRO','NOME','TAG','ID'],'Q'+(i+1)), X_3D:num(first(r,['X_3D','X','POS_X']),80+i*50), Y_3D:num(first(r,['Y_3D','Y','POS_Y']),120), Z_3D:num(first(r,['Z_3D','Z']),0), ROT_X:num(first(r,['ROT_X','ROT','ROTACAO'],90),90), Q_LARG:num(first(r,['Q_LARG','LARGURA','LARG'],600),600), Q_PROF:num(first(r,['Q_PROF','PROFUNDIDADE','PROF'],25),25), PLANTA:first(r,['PLANTA','PAVIMENTO','PAV','PAVIMENTO_ID'],'') }}
+function normalizePlanta(r,i){return {...r, _id:first(r,['ID','CODIGO','CÓDIGO','PLANTA','PAVIMENTO'],'P'+(i+1)), _nome:first(r,['NOME','PLANTA','PAVIMENTO','DESCRIÇÃO'],'Planta '+(i+1)), SVG:first(r,['SVG','LINK_SVG','URL_SVG','ARQUIVO_SVG','CONTEUDO_SVG'],'') }}
+function loadSample(){plantas=[{_id:'PAV_TESTE',_nome:'Planta teste - Torres W/E',SVG:DEFAULT_PLANTA_SVG}];quadros=[
+{_id:'Q01',_nome:'Q01',X_3D:400,Y_3D:500,Z_3D:0,ROT_X:90,Q_LARG:600,Q_PROF:25,PLANTA:'PAV_TESTE'},
+{_id:'Q02',_nome:'Q02',X_3D:55,Y_3D:600,Z_3D:0,ROT_X:90,Q_LARG:600,Q_PROF:25,PLANTA:'PAV_TESTE'},
+{_id:'Q03',_nome:'Q03',X_3D:1,Y_3D:250,Z_3D:0,ROT_X:90,Q_LARG:600,Q_PROF:30,PLANTA:'PAV_TESTE'},
+{_id:'Q04',_nome:'Q04',X_3D:500,Y_3D:5,Z_3D:0,ROT_X:90,Q_LARG:800,Q_PROF:30,PLANTA:'PAV_TESTE'},
+{_id:'Q05',_nome:'Q05',X_3D:200,Y_3D:120,Z_3D:0,ROT_X:90,Q_LARG:500,Q_PROF:20,PLANTA:'PAV_TESTE'},
+{_id:'Q06',_nome:'Q06',X_3D:20,Y_3D:300,Z_3D:0,ROT_X:90,Q_LARG:800,Q_PROF:20,PLANTA:'PAV_TESTE'}];objetos=[];refreshAll();toast('Exemplo local carregado')}
+async function loadAll(){try{$('status').textContent='Carregando CSVs...';plantas=(await fetchCSV($('urlPlantas').value)).map(normalizePlanta);objetos=(await fetchCSV($('urlObjetos').value));quadros=(await fetchCSV($('urlQuadros').value)).map(normalizeQuadro); if(!plantas.length) plantas=[{_id:'DEFAULT',_nome:'Planta padrão',SVG:DEFAULT_PLANTA_SVG}];refreshAll();toast('CSVs carregados')}catch(e){console.error(e);toast('Falha ao carregar CSV. Verifique publicação/CORS. Use exemplo local.');$('status').textContent='Erro no carregamento'}}
+function refreshAll(){const sel=$('plantaSelect');sel.innerHTML='';plantas.forEach(p=>{const o=document.createElement('option');o.value=p._id;o.textContent=p._nome+' ['+p._id+']';sel.appendChild(o)}); if(!sel.value&&plantas[0])sel.value=plantas[0]._id; render(); renderTable(); $('status').textContent=`${plantas.length} plantas | ${quadros.length} quadros`}
+function importSvgInto(layer,svgText){layer.innerHTML=''; if(!svgText){svgText=DEFAULT_PLANTA_SVG} if(/^https?:/i.test(svgText)){ layer.innerHTML='<text x="30" y="30" fill="#b54708">Link SVG detectado. Cole o conteúdo SVG ou use fetch via backend se houver CORS.</text>'; return }
+const doc=new DOMParser().parseFromString(svgText,'image/svg+xml'); const svg=doc.documentElement; [...svg.childNodes].forEach(n=>layer.appendChild(document.importNode(n,true))); const vb=svg.getAttribute('viewBox'); if(vb){ $('viewer').setAttribute('viewBox',vb); } else fitView(); }
+function currentPlanta(){return plantas.find(p=>p._id===$('plantaSelect').value)||plantas[0]}
+function getPlantTransform(id){
+  if(!id) return {sx:1,sy:1,rot:0,tx:0,ty:0};
+  if(!plantTransforms[id]) plantTransforms[id]={sx:1,sy:1,rot:0,tx:0,ty:0};
+  return plantTransforms[id];
+}
+function readPlantTransformInputs(){
+  const p=currentPlanta(); if(!p) return;
+  plantTransforms[p._id]={
+    sx:num($('plantScaleX').value,1),
+    sy:num($('plantScaleY').value,1),
+    rot:num($('plantRot').value,0),
+    tx:num($('plantOffsetX').value,0),
+    ty:num($('plantOffsetY').value,0)
+  };
+}
+function syncPlantTransformInputs(){
+  const p=currentPlanta(); const t=getPlantTransform(p?._id);
+  $('plantScaleX').value=t.sx; $('plantScaleY').value=t.sy; $('plantRot').value=t.rot; $('plantOffsetX').value=t.tx; $('plantOffsetY').value=t.ty;
+}
+function applyPlantTransform(){
+  const p=currentPlanta(); const t=getPlantTransform(p?._id);
+  const tr=`translate(${t.tx} ${t.ty}) rotate(${t.rot}) scale(${t.sx} ${t.sy})`;
+  $('layerPlanta').setAttribute('transform',tr);
+  $('layerAmb').setAttribute('transform',tr);
+}
+function render(){const p=currentPlanta(); syncPlantTransformInputs(); importSvgInto($('layerPlanta'),p?.SVG||DEFAULT_PLANTA_SVG); $('layerPlanta').style.display=$('chkPlanta').checked?'':'none'; $('layerAmb').style.display=$('chkAmb').checked?'':'none'; $('layerQuadros').style.display=$('chkQuadros').checked?'':'none'; applyPlantTransform(); renderQuadros(); applyCamera();}
+function quadroInPlanta(q){const p=currentPlanta(); return !q.PLANTA || !p || q.PLANTA===p._id || q.PLANTA===p._nome}
+function renderQuadros(){const layer=$('layerQuadros'); layer.innerHTML=''; const mmu=Math.max(1,num($('mmPorUnidade').value,10)); const labels=$('chkLabels').checked; quadros.filter(quadroInPlanta).forEach(q=>{const w=Math.max(6,q.Q_LARG/mmu), d=Math.max(4,q.Q_PROF/mmu), h=num($('alturaVisual').value,36); const g=document.createElementNS(NS,'g'); g.dataset.id=q._id; g.setAttribute('transform',`translate(${q.X_3D} ${q.Y_3D}) rotate(${q.ROT_X||0})`); g.style.cursor='move'; const r=document.createElementNS(NS,'rect'); r.setAttribute('x',-w/2); r.setAttribute('y',-d/2); r.setAttribute('width',w); r.setAttribute('height',d); r.setAttribute('rx',2); r.setAttribute('fill',q._id===selected?'#a6f4c5':'#d1fadf'); r.setAttribute('stroke',q._id===selected?'#027a48':'#039855'); r.setAttribute('stroke-width',q._id===selected?3:1.5); const line=document.createElementNS(NS,'line'); line.setAttribute('x1',0); line.setAttribute('y1',-h/2); line.setAttribute('x2',0); line.setAttribute('y2',h/2); line.setAttribute('stroke','#039855'); line.setAttribute('stroke-width','1'); g.append(r,line); if(labels){const t=document.createElementNS(NS,'text'); t.textContent=q._nome; t.setAttribute('x',w/2+5); t.setAttribute('y',4); t.setAttribute('font-size','12'); t.setAttribute('fill','#344054'); t.setAttribute('font-family','Arial'); t.setAttribute('transform',`rotate(${-q.ROT_X||0})`); g.appendChild(t)} g.addEventListener('pointerdown',startDragQuadro); g.addEventListener('click',e=>{e.stopPropagation();selectQuadro(q._id)}); layer.appendChild(g)});}
+function renderTable(){const term=$('search').value.toLowerCase(); $('tbody').innerHTML=''; quadros.filter(q=>(q._nome+' '+q._id).toLowerCase().includes(term)).forEach(q=>{const tr=document.createElement('tr'); if(q._id===selected)tr.className='selected'; tr.innerHTML=`<td>${q._nome}</td><td>${Math.round(q.X_3D)}</td><td>${Math.round(q.Y_3D)}</td><td>${q.Q_LARG}</td><td>${q.Q_PROF}</td>`; tr.onclick=()=>selectQuadro(q._id); $('tbody').appendChild(tr)})}
+function selectQuadro(id){selected=id; const q=quadros.find(x=>x._id===id); if(!q)return; ['X','Y','Rot','Larg','Prof'].forEach(k=>{}); $('editX').value=Math.round(q.X_3D);$('editY').value=Math.round(q.Y_3D);$('editRot').value=q.ROT_X;$('editLarg').value=q.Q_LARG;$('editProf').value=q.Q_PROF; $('output').textContent=JSON.stringify(q,null,2); renderQuadros(); renderTable()}
+function screenToSvg(evt){const pt=$('viewer').createSVGPoint();pt.x=evt.clientX;pt.y=evt.clientY;return pt.matrixTransform($('viewer').getScreenCTM().inverse())}
+let dragQ=null, pan=null;
+function startDragQuadro(e){e.stopPropagation(); const id=e.currentTarget.dataset.id; selectQuadro(id); dragQ={id,start:screenToSvg(e)}; e.currentTarget.setPointerCapture(e.pointerId);}
+$('viewer').addEventListener('pointermove',e=>{if(dragQ){const p=screenToSvg(e), q=quadros.find(x=>x._id===dragQ.id); q.X_3D=p.x; q.Y_3D=p.y; $('editX').value=Math.round(p.x); $('editY').value=Math.round(p.y); $('output').textContent=`${q._nome}\nX_3D=${Math.round(p.x)}\nY_3D=${Math.round(p.y)}\nQ_LARG=${q.Q_LARG}\nQ_PROF=${q.Q_PROF}`; renderQuadros(); renderTable(); return} if(pan){const dx=(e.clientX-pan.x)/view.k,dy=(e.clientY-pan.y)/view.k;view.x+=dx;view.y+=dy;pan={x:e.clientX,y:e.clientY};applyCamera();}});
+$('viewer').addEventListener('pointerup',()=>{dragQ=null;pan=null;document.body.classList.remove('dragging')});
+$('viewer').addEventListener('pointerdown',e=>{if(e.target.id==='viewer'||e.target.id==='gridRect'){pan={x:e.clientX,y:e.clientY};document.body.classList.add('dragging')}});
+$('viewer').addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY<0?1.1:.9;view.k*=f;applyCamera()},{passive:false});
+function applyCamera(){ $('camera').setAttribute('transform',`translate(${view.x} ${view.y}) scale(${view.k})`) }
+function fitView(){view={x:0,y:0,k:1};applyCamera()}
+$('btnLoad').onclick=loadAll;$('btnSample').onclick=loadSample;$('plantaSelect').onchange=render;$('search').oninput=renderTable;$('btnFit').onclick=fitView;$('zoomIn').onclick=()=>{view.k*=1.15;applyCamera()};$('zoomOut').onclick=()=>{view.k*=.87;applyCamera()};$('resetView').onclick=fitView;
+$('btnGrid').onclick=()=>{showGrid=!showGrid;$('gridRect').setAttribute('display',showGrid?'':'none')};
+['chkPlanta','chkAmb','chkQuadros','chkLabels','mmPorUnidade','alturaVisual'].forEach(id=>$(id).addEventListener('change',render));
+$('btnApply').onclick=()=>{const q=quadros.find(x=>x._id===selected); if(!q)return toast('Selecione um quadro'); q.X_3D=num($('editX').value,q.X_3D); q.Y_3D=num($('editY').value,q.Y_3D); q.ROT_X=num($('editRot').value,q.ROT_X); q.Q_LARG=num($('editLarg').value,q.Q_LARG); q.Q_PROF=num($('editProf').value,q.Q_PROF); renderQuadros(); renderTable(); selectQuadro(q._id)};
+$('btnCopy').onclick=async()=>{const q=quadros.find(x=>x._id===selected); if(!q)return toast('Selecione um quadro'); const line=`${q._nome},${Math.round(q.X_3D)},${Math.round(q.Y_3D)},${q.Z_3D},${q.ROT_X},${q.Q_LARG},${q.Q_PROF}`; await navigator.clipboard.writeText(line).catch(()=>{}); $('output').textContent=line; toast('Linha CSV copiada')};
+$('btnExport').onclick=()=>{$('output').textContent=JSON.stringify(quadros.map(q=>({id:q._id,nome:q._nome,planta:q.PLANTA,X_3D:Math.round(q.X_3D),Y_3D:Math.round(q.Y_3D),Z_3D:q.Z_3D,ROT_X:q.ROT_X,Q_LARG:q.Q_LARG,Q_PROF:q.Q_PROF})),null,2)};
+$('btnAdd').onclick=()=>{const id='NOVO_'+(quadros.length+1);quadros.push({_id:id,_nome:id,X_3D:100,Y_3D:100,Z_3D:0,ROT_X:90,Q_LARG:600,Q_PROF:25,PLANTA:currentPlanta()?._id||''});selectQuadro(id);renderQuadros();renderTable()};
+
+$('btnApplyPlantScale').onclick=()=>{readPlantTransformInputs(); applyPlantTransform(); toast('Escala da planta aplicada')};
+$('btnResetPlantScale').onclick=()=>{const p=currentPlanta(); if(!p)return; plantTransforms[p._id]={sx:1,sy:1,rot:0,tx:0,ty:0}; syncPlantTransformInputs(); applyPlantTransform(); toast('Escala da planta resetada')};
+$('btnCopyPlantScale').onclick=async()=>{const p=currentPlanta(); if(!p)return; readPlantTransformInputs(); const t=getPlantTransform(p._id); const txt=`PLANTA=${p._id}; ESCALA_X=${t.sx}; ESCALA_Y=${t.sy}; OFFSET_X=${t.tx}; OFFSET_Y=${t.ty}; ROT=${t.rot}`; await navigator.clipboard.writeText(txt).catch(()=>{}); $('output').textContent=txt; toast('Ajuste da planta copiado')};
+['plantScaleX','plantScaleY','plantRot','plantOffsetX','plantOffsetY'].forEach(id=>$(id).addEventListener('input',()=>{readPlantTransformInputs(); applyPlantTransform();}));
+loadSample();
+</script>
+</body>
+</html>
