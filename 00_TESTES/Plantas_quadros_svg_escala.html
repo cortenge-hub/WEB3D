@@ -106,6 +106,7 @@
       <table><thead><tr><th>Quadro</th><th>X</th><th>Y</th><th>Larg</th><th>Prof</th></tr></thead><tbody id="tbody"></tbody></table>
       <div class="divider"></div>
       <label>Saída / cópia</label><div id="output" class="code">Selecione ou movimente um quadro.</div>
+      <label>Diagnóstico CSV</label><div id="diag" class="code">Ainda não carregado.</div>
     </div>
   </section>
 </main>
@@ -113,15 +114,61 @@
 <script>
 const DEFAULT_PLANTA_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 590"><g><text x="100" y="55" font-family="Arial" font-size="16">TORRE W1</text><text x="370" y="55" font-family="Arial" font-size="16">TORRE W2</text><text x="510" y="55" font-family="Arial" font-size="16">TORRE W3</text><text x="820" y="55" font-family="Arial" font-size="16">TORRE W4</text><text x="100" y="555" font-family="Arial" font-size="16">TORRE E1</text><text x="370" y="555" font-family="Arial" font-size="16">TORRE E2</text><text x="510" y="555" font-family="Arial" font-size="16">TORRE E3</text><text x="820" y="555" font-family="Arial" font-size="16">TORRE E4</text><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="80" y="120"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="350" y="120"/><rect fill="none" width="80" height="100" stroke="#222" stroke-width="1.5" x="470" y="120"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="800" y="120"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="80" y="370"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="350" y="370"/><rect fill="none" width="80" height="100" stroke="#222" stroke-width="1.5" x="470" y="370"/><rect fill="none" width="40" height="100" stroke="#222" stroke-width="1.5" x="800" y="370"/><path d="M100,120L100,85L370,85L370,120" fill="none" stroke="#222" stroke-width="1.5"/><path d="M390,120L470,120" fill="none" stroke="#222" stroke-width="1.5"/><path d="M510,120L510,85L820,85L820,120" fill="none" stroke="#222" stroke-width="1.5"/><path d="M100,470L100,505L370,505L370,470" fill="none" stroke="#222" stroke-width="1.5"/><path d="M390,470L470,470" fill="none" stroke="#222" stroke-width="1.5"/><path d="M510,470L510,505L820,505L820,470" fill="none" stroke="#222" stroke-width="1.5"/><path d="M80,170L40,170L40,420L80,420" fill="none" stroke="#222" stroke-width="1.5"/><path d="M840,170L880,170L880,420L840,420" fill="none" stroke="#222" stroke-width="1.5"/></g></svg>`;
 let plantas=[], objetos=[], quadros=[], selected=null, mode='select', showGrid=false;
+let plantTransforms={};
+let csvDiagnostics=[];
 let view={x:0,y:0,k:1}; const NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
 function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
-function parseCSV(text){const rows=[];let row=[],cur='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&q&&n==='"'){cur+='"';i++}else if(c==='"'){q=!q}else if(c===','&&!q){row.push(cur);cur=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cur);if(row.some(v=>v.trim()!==''))rows.push(row);row=[];cur=''}else cur+=c}row.push(cur);if(row.some(v=>v.trim()!==''))rows.push(row);if(!rows.length)return[];const head=rows.shift().map(h=>h.trim());return rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]||'').trim()])))}
-async function fetchCSV(url){const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error(r.status+' '+url); return parseCSV(await r.text())}
-function first(obj,names,def=''){for(const n of names){const k=Object.keys(obj).find(k=>k.toUpperCase().trim()===n.toUpperCase());if(k && obj[k]!==undefined && obj[k]!== '') return obj[k]}return def}
+function cleanHeader(h){return String(h||'').replace(/^\uFEFF/,'').trim()}
+function normKey(s){return cleanHeader(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9]/gi,'').toUpperCase()}
+function parseCSV(text){
+  const rows=[];let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+    if(c==='"'&&q&&n==='"'){cur+='"';i++}
+    else if(c==='"'){q=!q}
+    else if(c===','&&!q){row.push(cur);cur=''}
+    else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cur);if(row.some(v=>String(v).trim()!==''))rows.push(row);row=[];cur=''}
+    else cur+=c
+  }
+  row.push(cur); if(row.some(v=>String(v).trim()!==''))rows.push(row);
+  if(!rows.length) return {headers:[],data:[]};
+  const headers=rows.shift().map(cleanHeader);
+  const data=rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||'').trim()])));
+  return {headers,data};
+}
+async function fetchCSVInfo(name,url){
+  const r=await fetch(url,{cache:'no-store', mode:'cors'});
+  if(!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
+  const parsed=parseCSV(await r.text());
+  csvDiagnostics.push(`${name}: OK | ${parsed.data.length} linhas | cabeçalhos: ${parsed.headers.join(' | ')}`);
+  return parsed;
+}
+function first(obj,names,def=''){
+  const keys=Object.keys(obj||{});
+  for(const n of names){const nk=normKey(n); const k=keys.find(k=>normKey(k)===nk); if(k && obj[k]!==undefined && String(obj[k]).trim()!=='') return obj[k]}
+  return def;
+}
 function num(v,d=0){const n=parseFloat(String(v??'').replace(',','.')); return isNaN(n)?d:n}
-function normalizeQuadro(r,i){return {...r, _id:first(r,['ID','CODIGO','CÓDIGO','QUADRO','NOME'],'Q'+(i+1)), _nome:first(r,['QUADRO','NOME','TAG','ID'],'Q'+(i+1)), X_3D:num(first(r,['X_3D','X','POS_X']),80+i*50), Y_3D:num(first(r,['Y_3D','Y','POS_Y']),120), Z_3D:num(first(r,['Z_3D','Z']),0), ROT_X:num(first(r,['ROT_X','ROT','ROTACAO'],90),90), Q_LARG:num(first(r,['Q_LARG','LARGURA','LARG'],600),600), Q_PROF:num(first(r,['Q_PROF','PROFUNDIDADE','PROF'],25),25), PLANTA:first(r,['PLANTA','PAVIMENTO','PAV','PAVIMENTO_ID'],'') }}
-function normalizePlanta(r,i){return {...r, _id:first(r,['ID','CODIGO','CÓDIGO','PLANTA','PAVIMENTO'],'P'+(i+1)), _nome:first(r,['NOME','PLANTA','PAVIMENTO','DESCRIÇÃO'],'Planta '+(i+1)), SVG:first(r,['SVG','LINK_SVG','URL_SVG','ARQUIVO_SVG','CONTEUDO_SVG'],'') }}
+function normalizeQuadro(r,i){
+  return {...r,
+    _id:first(r,['ID','ID_QUADRO','CODIGO','CÓDIGO','COD_QUADRO','QUADRO','NOME','TAG'],'Q'+(i+1)),
+    _nome:first(r,['QUADRO','NOME','NOME_QUADRO','TAG','ID','CODIGO'],'Q'+(i+1)),
+    X_3D:num(first(r,['X_3D','X3D','X','POS_X','POSICAO_X','POSIÇÃO_X','X_PLANTA']),80+i*50),
+    Y_3D:num(first(r,['Y_3D','Y3D','Y','POS_Y','POSICAO_Y','POSIÇÃO_Y','Y_PLANTA']),120),
+    Z_3D:num(first(r,['Z_3D','Z3D','Z']),0),
+    ROT_X:num(first(r,['ROT_X','ROTX','ROT','ROTACAO','ROTAÇÃO','ANGULO','ÂNGULO'],90),90),
+    Q_LARG:num(first(r,['Q_LARG','QLARG','LARGURA','LARG','Q_LARGURA','WIDTH'],600),600),
+    Q_PROF:num(first(r,['Q_PROF','QPROF','PROFUNDIDADE','PROF','Q_PROFUNDIDADE','DEPTH'],25),25),
+    PLANTA:first(r,['PLANTA','ID_PLANTA','PAVIMENTO','PAV','PAVIMENTO_ID','COD_PLANTA','04_PLANTAS'],'')
+  };
+}
+function normalizePlanta(r,i){
+  return {...r,
+    _id:first(r,['ID','ID_PLANTA','CODIGO','CÓDIGO','COD_PLANTA','PLANTA','PAVIMENTO','PAV'],'P'+(i+1)),
+    _nome:first(r,['NOME','NOME_PLANTA','DESCRICAO','DESCRIÇÃO','PLANTA','PAVIMENTO','PAV'],'Planta '+(i+1)),
+    SVG:first(r,['SVG','SVG_PLANTA','LINK_SVG','URL_SVG','ARQUIVO_SVG','CONTEUDO_SVG','CONTEÚDO_SVG','BASE_SVG','PLANTA_SVG','LINK'],'')
+  };
+}
 function loadSample(){plantas=[{_id:'PAV_TESTE',_nome:'Planta teste - Torres W/E',SVG:DEFAULT_PLANTA_SVG}];quadros=[
 {_id:'Q01',_nome:'Q01',X_3D:400,Y_3D:500,Z_3D:0,ROT_X:90,Q_LARG:600,Q_PROF:25,PLANTA:'PAV_TESTE'},
 {_id:'Q02',_nome:'Q02',X_3D:55,Y_3D:600,Z_3D:0,ROT_X:90,Q_LARG:600,Q_PROF:25,PLANTA:'PAV_TESTE'},
@@ -129,7 +176,24 @@ function loadSample(){plantas=[{_id:'PAV_TESTE',_nome:'Planta teste - Torres W/E
 {_id:'Q04',_nome:'Q04',X_3D:500,Y_3D:5,Z_3D:0,ROT_X:90,Q_LARG:800,Q_PROF:30,PLANTA:'PAV_TESTE'},
 {_id:'Q05',_nome:'Q05',X_3D:200,Y_3D:120,Z_3D:0,ROT_X:90,Q_LARG:500,Q_PROF:20,PLANTA:'PAV_TESTE'},
 {_id:'Q06',_nome:'Q06',X_3D:20,Y_3D:300,Z_3D:0,ROT_X:90,Q_LARG:800,Q_PROF:20,PLANTA:'PAV_TESTE'}];objetos=[];refreshAll();toast('Exemplo local carregado')}
-async function loadAll(){try{$('status').textContent='Carregando CSVs...';plantas=(await fetchCSV($('urlPlantas').value)).map(normalizePlanta);objetos=(await fetchCSV($('urlObjetos').value));quadros=(await fetchCSV($('urlQuadros').value)).map(normalizeQuadro); if(!plantas.length) plantas=[{_id:'DEFAULT',_nome:'Planta padrão',SVG:DEFAULT_PLANTA_SVG}];refreshAll();toast('CSVs carregados')}catch(e){console.error(e);toast('Falha ao carregar CSV. Verifique publicação/CORS. Use exemplo local.');$('status').textContent='Erro no carregamento'}}
+async function loadAll(){
+  csvDiagnostics=[];
+  $('status').textContent='Carregando CSVs...';
+  const results=await Promise.allSettled([
+    fetchCSVInfo('04_PLANTAS',$('urlPlantas').value),
+    fetchCSVInfo('08_OBJETOS3D',$('urlObjetos').value),
+    fetchCSVInfo('01_QUADROS',$('urlQuadros').value)
+  ]);
+  if(results[0].status==='fulfilled') plantas=results[0].value.data.map(normalizePlanta); else csvDiagnostics.push('04_PLANTAS: ERRO | '+results[0].reason.message);
+  if(results[1].status==='fulfilled') objetos=results[1].value.data; else {objetos=[]; csvDiagnostics.push('08_OBJETOS3D: ERRO | '+results[1].reason.message+' | carregamento continua sem esta tabela');}
+  if(results[2].status==='fulfilled') quadros=results[2].value.data.map(normalizeQuadro); else csvDiagnostics.push('01_QUADROS: ERRO | '+results[2].reason.message);
+  if(!plantas.length) plantas=[{_id:'DEFAULT',_nome:'Planta padrão / fallback',SVG:DEFAULT_PLANTA_SVG}];
+  refreshAll();
+  $('diag').textContent=csvDiagnostics.join('\n');
+  const okQuadros=quadros.length>0, okPlantas=plantas.length>0;
+  $('status').textContent = `${plantas.length} plantas | ${quadros.length} quadros | ${objetos.length} objetos`;
+  toast(okQuadros?'CSVs carregados. Verifique diagnóstico.':'Carregou parcialmente. Verifique diagnóstico CSV.');
+}
 function refreshAll(){const sel=$('plantaSelect');sel.innerHTML='';plantas.forEach(p=>{const o=document.createElement('option');o.value=p._id;o.textContent=p._nome+' ['+p._id+']';sel.appendChild(o)}); if(!sel.value&&plantas[0])sel.value=plantas[0]._id; render(); renderTable(); $('status').textContent=`${plantas.length} plantas | ${quadros.length} quadros`}
 function importSvgInto(layer,svgText){layer.innerHTML=''; if(!svgText){svgText=DEFAULT_PLANTA_SVG} if(/^https?:/i.test(svgText)){ layer.innerHTML='<text x="30" y="30" fill="#b54708">Link SVG detectado. Cole o conteúdo SVG ou use fetch via backend se houver CORS.</text>'; return }
 const doc=new DOMParser().parseFromString(svgText,'image/svg+xml'); const svg=doc.documentElement; [...svg.childNodes].forEach(n=>layer.appendChild(document.importNode(n,true))); const vb=svg.getAttribute('viewBox'); if(vb){ $('viewer').setAttribute('viewBox',vb); } else fitView(); }
